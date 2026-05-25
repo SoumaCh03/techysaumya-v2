@@ -1,0 +1,194 @@
+# ============================================================
+# TechySaumya V2 — Production .gitignore
+# ============================================================
+
+# ──────────────────────────────────────────────
+# 📦 Dependencies
+# ──────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.pnpm-store/
+pnpm-lock.yaml
+
+# ──────────────────────────────────────────────
+# ⚡ Next.js Build Output
+# ──────────────────────────────────────────────
+.next/
+out/
+build/
+dist/
+
+# ──────────────────────────────────────────────
+# 🔐 Environment Variables & Secrets
+# ──────────────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+.env.staging.local
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# ──────────────────────────────────────────────
+# 🧪 Testing & Coverage
+# ──────────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+playwright-report/
+e2e-results/
+
+# ──────────────────────────────────────────────
+# 📝 TypeScript
+# ──────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ──────────────────────────────────────────────
+# 🗃️ Logs & Debug
+# ──────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ──────────────────────────────────────────────
+# 🖥️ OS Generated Files
+# ──────────────────────────────────────────────
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ──────────────────────────────────────────────
+# 🛠️ Editor / IDE Files
+# ──────────────────────────────────────────────
+
+# VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.code-workspace
+
+# JetBrains (WebStorm, IntelliJ)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Vim / Neovim
+*.swp
+*.swo
+*.swn
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.\#*
+.emacs.desktop
+.emacs.desktop.lock
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# ──────────────────────────────────────────────
+# ☁️ Deployment Platforms
+# ──────────────────────────────────────────────
+
+# Vercel
+.vercel
+
+# Netlify
+.netlify/
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Docker
+*.dockerignore
+
+# ──────────────────────────────────────────────
+# 📸 Local Uploads (keep folder, ignore contents)
+# ──────────────────────────────────────────────
+public/uploads/*
+!public/uploads/.gitkeep
+
+# ──────────────────────────────────────────────
+# 🧰 Misc
+# ──────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.turbo/
+.swc/
+*.tgz
+*.tar.gz
+*.zip
+bundle-analyzer-report.html
+storybook-static/
