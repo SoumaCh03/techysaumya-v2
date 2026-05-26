@@ -136,6 +136,7 @@ export default function Featured() {
                 <img
                   src={project.image}
                   alt={project.title}
+                  loading="lazy"
                   className="w-full h-full object-cover scale-102 group-hover:scale-106 transition-transform duration-700 opacity-75"
                 />
               </div>

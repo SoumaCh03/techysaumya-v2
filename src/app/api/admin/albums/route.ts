@@ -1,13 +1,6 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getAlbums, saveAlbums, Album } from "@/lib/db";
-
-// Helper to verify admin session
-async function isAuthorized(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("techysaumya_session");
-  return !!(session && session.value);
-}
+import { isAuthorized } from "@/lib/auth";
 
 // 1. GET (Public): Returns all albums ordered
 export async function GET() {
@@ -164,3 +157,39 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Failed to delete album." }, { status: 500 });
   }
 }
+
+// 5. PATCH (Admin Only): Rename a photo within an album
+export async function PATCH(req: Request) {
+  if (!(await isAuthorized())) {
+    return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { albumId, photoId, newTitle } = body;
+
+    if (!albumId || !photoId || !newTitle) {
+      return NextResponse.json({ error: "albumId, photoId, and newTitle are required." }, { status: 400 });
+    }
+
+    const albums = await getAlbums();
+    const albumIdx = albums.findIndex((a) => a.id === albumId);
+    if (albumIdx === -1) {
+      return NextResponse.json({ error: "Album not found." }, { status: 404 });
+    }
+
+    const photoIdx = albums[albumIdx].images.findIndex((img) => img.id === photoId);
+    if (photoIdx === -1) {
+      return NextResponse.json({ error: "Photo not found." }, { status: 404 });
+    }
+
+    albums[albumIdx].images[photoIdx].title = newTitle;
+    await saveAlbums(albums);
+
+    return NextResponse.json({ success: true, message: "Photo title updated successfully." });
+  } catch (e) {
+    console.error("Albums PATCH Error:", e);
+    return NextResponse.json({ error: "Failed to update photo title." }, { status: 500 });
+  }
+}
+

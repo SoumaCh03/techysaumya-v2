@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import { connectDB } from "@/lib/mongoose";
+import AlbumModel from "@/models/Album";
 
 export interface Photo {
   id: string;
@@ -17,8 +17,6 @@ export interface Album {
   order: number;
   images: Photo[];
 }
-
-const LOCAL_DB_PATH = path.join(process.cwd(), "src/data/albums.json");
 
 // Pre-seeded authentic albums to make the portfolio look premium on first load
 const DEFAULT_ALBUMS: Album[] = [
@@ -96,65 +94,80 @@ const DEFAULT_ALBUMS: Album[] = [
   }
 ];
 
-// Helper to guarantee directories exist
-function ensureDirectoryExistence(filePath: string) {
-  const dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
-  ensureDirectoryExistence(dirname);
-  fs.mkdirSync(dirname);
-}
-
-// In-memory cache for production fallback if no cloud DB is configured
-let inMemoryAlbumsCache: Album[] | null = null;
-
 export async function getAlbums(): Promise<Album[]> {
-  // If Vercel Blob Token is set, fetch database dynamically
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    try {
-      // In production we can fetch it from Vercel Blob
-      // If not initialized yet, we will fallback to default
-      const res = await fetch("https://techysaumyadeep.vercel.app/api/admin/albums", {
-        cache: "no-store"
-      });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch (e) {
-      console.warn("Vercel Blob database read error, falling back to cache.", e);
-    }
+  await connectDB();
+  let dbAlbums = await AlbumModel.find().sort({ order: 1 }).lean();
+
+  if (dbAlbums.length === 0) {
+    console.log("No albums found in MongoDB. Seeding DEFAULT_ALBUMS...");
+    const seedData = DEFAULT_ALBUMS.map((a) => ({
+      albumId: a.id,
+      title: a.title,
+      description: a.description,
+      slug: a.slug,
+      coverImage: a.coverImage,
+      order: a.order,
+      images: a.images.map((img) => ({
+        id: img.id,
+        url: img.url,
+        title: img.title,
+        order: img.order,
+      })),
+    }));
+    await AlbumModel.insertMany(seedData);
+    dbAlbums = await AlbumModel.find().sort({ order: 1 }).lean();
   }
 
-  // Local Disk Mode
-  try {
-    if (fs.existsSync(LOCAL_DB_PATH)) {
-      const data = fs.readFileSync(LOCAL_DB_PATH, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (e) {
-    console.error("Local database read error:", e);
-  }
-
-  // Fallback
-  if (!inMemoryAlbumsCache) {
-    inMemoryAlbumsCache = [...DEFAULT_ALBUMS];
-    saveAlbums(inMemoryAlbumsCache); // Seed local file
-  }
-  return inMemoryAlbumsCache;
+  return dbAlbums.map((a) => ({
+    id: a.albumId,
+    title: a.title,
+    description: a.description,
+    slug: a.slug,
+    coverImage: a.coverImage,
+    order: a.order,
+    images: (a.images || []).map((img) => ({
+      id: img.id,
+      url: img.url,
+      title: img.title,
+      order: img.order,
+    })),
+  }));
 }
 
 export async function saveAlbums(albums: Album[]): Promise<boolean> {
-  // Update cache
-  inMemoryAlbumsCache = albums;
-
-  // Local Disk Mode
   try {
-    ensureDirectoryExistence(LOCAL_DB_PATH);
-    fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(albums, null, 2), "utf-8");
+    await connectDB();
+
+    const inputIds = albums.map((a) => a.id);
+
+    // Delete any album not in inputIds
+    await AlbumModel.deleteMany({ albumId: { $nin: inputIds } });
+
+    // Upsert each album
+    for (const a of albums) {
+      await AlbumModel.findOneAndUpdate(
+        { albumId: a.id },
+        {
+          title: a.title,
+          description: a.description,
+          slug: a.slug,
+          coverImage: a.coverImage,
+          order: a.order,
+          images: (a.images || []).map((img) => ({
+            id: img.id,
+            url: img.url,
+            title: img.title,
+            order: img.order,
+          })),
+        },
+        { upsert: true, new: true }
+      );
+    }
+
     return true;
   } catch (e) {
-    console.error("Local database save error:", e);
+    console.error("MongoDB saveAlbums error:", e);
     return false;
   }
 }
+

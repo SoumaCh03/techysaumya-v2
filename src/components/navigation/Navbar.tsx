@@ -28,6 +28,7 @@ export default function Navbar() {
     { label: "Skills", target: "skills" },
     { label: "Projects", target: "projects" },
     { label: "Photography", target: "photography", isExternal: true },
+    { label: "Blog", target: "blog", isExternal: true },
     { label: "Journey", target: "journey", isExternal: true },
     { label: "Contact", target: "contact" },
   ];
@@ -98,7 +99,7 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300 px-4 md:px-8 py-4">
       <nav
-        className={`max-w-7xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-full transition-all duration-300 ${
+        className={`w-full max-w-7xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-full transition-all duration-300 ${
           scrolled || !isHome
             ? "glass-panel bg-bg-surface/85 border-white/5 shadow-black/80"
             : "border-transparent bg-transparent"
@@ -125,7 +126,7 @@ export default function Navbar() {
         </Link>
 
         {/* DESKTOP LINKS */}
-        <div className="hidden lg:flex items-center gap-7">
+        <div className="hidden lg:flex items-center gap-3.5 lg:gap-4 xl:gap-5">
           {navLinks.map((link, idx) => {
             const isTargetActive = isHome && activeSection === link.target && !link.isExternal;
             const href = link.isExternal ? `/${link.target}` : `/#${link.target}`;
@@ -135,7 +136,7 @@ export default function Navbar() {
                 key={idx}
                 href={href}
                 onClick={(e) => handleNavClick(e, link)}
-                className={`relative text-[13.5px] font-medium tracking-wide uppercase transition-colors duration-300 hover:text-white ${
+                className={`relative text-[11px] lg:text-[12px] xl:text-[13px] font-semibold tracking-wider uppercase transition-colors duration-300 hover:text-white ${
                   isTargetActive ? "text-cyan-accent" : "text-text-secondary"
                 }`}
               >
@@ -148,13 +149,18 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* RESUME DIRECT BUTTON */}
+        {/* ADMIN QUICK-ACCESS ACTION BUTTON */}
         <div className="hidden lg:flex items-center">
           <Link
-            href="/resume"
-            className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/10 bg-white/3 font-sans text-xs font-semibold tracking-wide uppercase text-white hover:text-cyan-accent hover:border-cyan-accent/40 hover:bg-cyan-accent/5 transition-all duration-300"
+            href="/admin"
+            className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-accent/25 bg-cyan-accent/5 font-sans text-[11px] lg:text-xs font-semibold tracking-wide uppercase text-cyan-accent hover:text-white hover:border-cyan-accent/50 hover:bg-cyan-accent/15 transition-all duration-300 shadow-[0_0_12px_rgba(0,240,255,0.15)] group/btn"
+            title="Access Admin Dashboard"
           >
-            Resume <ArrowRight className="w-3.5 h-3.5" />
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-accent opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-accent"></span>
+            </span>
+            <span>Admin Login</span>
           </Link>
         </div>
 
@@ -206,6 +212,14 @@ export default function Navbar() {
           })}
 
           <div className="h-[1px] bg-white/5 my-4" />
+
+          <Link
+            href="/admin"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-cyan-accent/20 bg-cyan-accent/5 text-xs font-semibold tracking-wide uppercase text-cyan-accent hover:text-white hover:border-cyan-accent transition-all"
+          >
+            Admin Panel
+          </Link>
 
           <Link
             href="/resume"

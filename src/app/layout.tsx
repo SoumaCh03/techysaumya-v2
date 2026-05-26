@@ -3,7 +3,9 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import StarField from "@/components/shared/StarField";
+import SocialFloat from "@/components/social/SocialFloat";
 import Script from "next/script";
+
 
 // 1. Google Font Preloads
 const inter = Inter({
@@ -179,88 +181,90 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
         />
         {/* Development Remote Console Error Overlay */}
-        <Script
-          id="remote-error-overlay"
-          strategy="beforeInteractive"
-        >
-          {`
-            if (typeof window !== 'undefined') {
-              // 1. Uncaught global runtime errors
-              window.onerror = function(msg, url, line, col, error) {
-                var div = document.createElement('div');
-                div.style.position = 'fixed';
-                div.style.top = '0';
-                div.style.left = '0';
-                div.style.width = '100%';
-                div.style.background = '#ff0033';
-                div.style.color = '#ffffff';
-                div.style.padding = '12px 16px';
-                div.style.zIndex = '999999';
-                div.style.fontSize = '12px';
-                div.style.fontFamily = 'monospace';
-                div.style.wordBreak = 'break-all';
-                div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
-                div.innerHTML = '<strong>Remote Global Error:</strong> ' + msg + '<br/><small>at ' + url + ':' + line + ':' + col + '</small>';
-                document.documentElement.appendChild(div);
-              };
+        {process.env.NODE_ENV === "development" && (
+          <Script
+            id="remote-error-overlay"
+            strategy="beforeInteractive"
+          >
+            {`
+              if (typeof window !== 'undefined') {
+                // 1. Uncaught global runtime errors
+                window.onerror = function(msg, url, line, col, error) {
+                  var div = document.createElement('div');
+                  div.style.position = 'fixed';
+                  div.style.top = '0';
+                  div.style.left = '0';
+                  div.style.width = '100%';
+                  div.style.background = '#ff0033';
+                  div.style.color = '#ffffff';
+                  div.style.padding = '12px 16px';
+                  div.style.zIndex = '999999';
+                  div.style.fontSize = '12px';
+                  div.style.fontFamily = 'monospace';
+                  div.style.wordBreak = 'break-all';
+                  div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+                  div.innerHTML = '<strong>Remote Global Error:</strong> ' + msg + '<br/><small>at ' + url + ':' + line + ':' + col + '</small>';
+                  document.documentElement.appendChild(div);
+                };
 
-              // 2. Unhandled Promise Rejections
-              window.onunhandledrejection = function(event) {
-                var div = document.createElement('div');
-                div.style.position = 'fixed';
-                div.style.top = '0';
-                div.style.left = '0';
-                div.style.width = '100%';
-                div.style.background = '#ff8800';
-                div.style.color = '#ffffff';
-                div.style.padding = '12px 16px';
-                div.style.zIndex = '999999';
-                div.style.fontSize = '12px';
-                div.style.fontFamily = 'monospace';
-                div.style.wordBreak = 'break-all';
-                div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
-                div.innerHTML = '<strong>Remote Promise Rejection:</strong> ' + (event.reason ? (event.reason.message || event.reason) : 'Unknown rejection') + '';
-                document.documentElement.appendChild(div);
-              };
+                // 2. Unhandled Promise Rejections
+                window.onunhandledrejection = function(event) {
+                  var div = document.createElement('div');
+                  div.style.position = 'fixed';
+                  div.style.top = '0';
+                  div.style.left = '0';
+                  div.style.width = '100%';
+                  div.style.background = '#ff8800';
+                  div.style.color = '#ffffff';
+                  div.style.padding = '12px 16px';
+                  div.style.zIndex = '999999';
+                  div.style.fontSize = '12px';
+                  div.style.fontFamily = 'monospace';
+                  div.style.wordBreak = 'break-all';
+                  div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+                  div.innerHTML = '<strong>Remote Promise Rejection:</strong> ' + (event.reason ? (event.reason.message || event.reason) : 'Unknown rejection') + '';
+                  document.documentElement.appendChild(div);
+                };
 
-              // 3. React Hydration / Console Errors
-              var originalConsoleError = console.error;
-              console.error = function() {
-                // Call original console.error so it shows in terminal
-                originalConsoleError.apply(console, arguments);
-                
-                // Convert arguments to string
-                var args = Array.prototype.slice.call(arguments);
-                var msg = args.map(function(arg) {
-                  if (arg instanceof Error) return arg.message + '\\n' + arg.stack;
-                  if (typeof arg === 'object') {
-                    try { return JSON.stringify(arg); } catch(e) { return String(arg); }
-                  }
-                  return String(arg);
-                }).join(' ');
+                // 3. React Hydration / Console Errors
+                var originalConsoleError = console.error;
+                console.error = function() {
+                  // Call original console.error so it shows in terminal
+                  originalConsoleError.apply(console, arguments);
+                  
+                  // Convert arguments to string
+                  var args = Array.prototype.slice.call(arguments);
+                  var msg = args.map(function(arg) {
+                    if (arg instanceof Error) return arg.message + '\\n' + arg.stack;
+                    if (typeof arg === 'object') {
+                      try { return JSON.stringify(arg); } catch(e) { return String(arg); }
+                    }
+                    return String(arg);
+                  }).join(' ');
 
-                // Ignore hot reload noise if any, focus on hydration/react errors
-                if (msg.indexOf('ping') !== -1 || msg.indexOf('HMR') !== -1) return;
+                  // Ignore hot reload noise if any, focus on hydration/react errors
+                  if (msg.indexOf('ping') !== -1 || msg.indexOf('HMR') !== -1) return;
 
-                var div = document.createElement('div');
-                div.style.position = 'fixed';
-                div.style.top = '0';
-                div.style.left = '0';
-                div.style.width = '100%';
-                div.style.background = '#8b0000';
-                div.style.color = '#ffffff';
-                div.style.padding = '12px 16px';
-                div.style.zIndex = '999999';
-                div.style.fontSize = '12.5px';
-                div.style.fontFamily = 'monospace';
-                div.style.wordBreak = 'break-all';
-                div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.6)';
-                div.innerHTML = '<strong>React/Console Error:</strong> ' + msg.replace(/\\n/g, '<br/>');
-                document.documentElement.appendChild(div);
-              };
-            }
-          `}
-        </Script>
+                  var div = document.createElement('div');
+                  div.style.position = 'fixed';
+                  div.style.top = '0';
+                  div.style.left = '0';
+                  div.style.width = '100%';
+                  div.style.background = '#8b0000';
+                  div.style.color = '#ffffff';
+                  div.style.padding = '12px 16px';
+                  div.style.zIndex = '999999';
+                  div.style.fontSize = '12.5px';
+                  div.style.fontFamily = 'monospace';
+                  div.style.wordBreak = 'break-all';
+                  div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.6)';
+                  div.innerHTML = '<strong>React/Console Error:</strong> ' + msg.replace(/\\n/g, '<br/>');
+                  document.documentElement.appendChild(div);
+                };
+              }
+            `}
+          </Script>
+        )}
       </head>
       <body className="min-h-full flex flex-col bg-bg-base text-text-primary selection:bg-cyan-accent/20 selection:text-cyan-accent relative">
         <Providers>
@@ -271,8 +275,12 @@ export default function RootLayout({
           <div className="relative z-10 w-full min-h-screen flex flex-col">
             {children}
           </div>
+          
+          {/* Floating Social Buttons */}
+          <SocialFloat />
         </Providers>
       </body>
+
     </html>
   );
 }

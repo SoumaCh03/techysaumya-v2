@@ -12,6 +12,8 @@ export async function POST(req: Request) {
       );
     }
 
+    const smtpHost = process.env.SMTP_EMAIL_HOST || "smtp.gmail.com";
+    const smtpPort = parseInt(process.env.SMTP_EMAIL_PORT || "587", 10);
     const smtpUser = process.env.SMTP_EMAIL_USER;
     const smtpPass = process.env.SMTP_EMAIL_PASS;
 
@@ -25,12 +27,15 @@ export async function POST(req: Request) {
       });
     }
 
-    // Initialize SMTP Transporter for Google Mail
+    // Initialize SMTP Transporter — port 587 with STARTTLS
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: smtpHost,
+      port: smtpPort,
+      secure: false,      // false = STARTTLS on port 587
+      requireTLS: true,   // force upgrade to TLS
       auth: {
         user: smtpUser,
-        pass: smtpPass,
+        pass: smtpPass,   // Gmail App Password (16 chars)
       },
     });
 

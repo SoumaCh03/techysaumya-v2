@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { uploadImage } from "@/lib/storage";
+import { isAuthorized } from "@/lib/auth";
 
-// Helper to verify admin session
-async function isAuthorized(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("techysaumya_session");
-  return !!(session && session.value);
-}
 
 export async function POST(req: Request) {
   if (!(await isAuthorized())) {

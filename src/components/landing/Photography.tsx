@@ -86,8 +86,9 @@ export default function PhotographyPreview() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             {albums.map((album) => (
               <Link
-                key={album.id}
+                key={album.id || album.slug}
                 href={`/photography#${album.slug}`}
+
                 className="group relative h-96 rounded-2xl overflow-hidden border border-white/5 bg-black shadow-2xl flex flex-col justify-end p-6 hover:border-amber-accent/35 transition-all duration-500"
               >
                 {/* Image background with zoom on hover */}
