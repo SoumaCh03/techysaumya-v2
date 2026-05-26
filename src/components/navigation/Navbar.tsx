@@ -121,14 +121,16 @@ export default function Navbar() {
           }
         }}>
           <h1 className="font-display font-extrabold text-lg md:text-xl tracking-tight text-white transition-all group-hover:text-cyan-accent group-hover:drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
-            TechySaumya<span className="text-cyan-accent group-hover:text-white transition-colors font-sans">v2</span>
+            TechySaumya<span className="text-cyan-accent group-hover:text-white transition-colors font-sans">_v2.0</span>
           </h1>
         </Link>
 
         {/* DESKTOP LINKS */}
         <div className="hidden lg:flex items-center gap-3.5 lg:gap-4 xl:gap-5">
           {navLinks.map((link, idx) => {
-            const isTargetActive = isHome && activeSection === link.target && !link.isExternal;
+            const isTargetActive = link.isExternal
+              ? pathname === `/${link.target}` || pathname.startsWith(`/${link.target}/`)
+              : isHome && activeSection === link.target;
             const href = link.isExternal ? `/${link.target}` : `/#${link.target}`;
 
             return (
@@ -194,7 +196,9 @@ export default function Navbar() {
 
         <div className="flex flex-col gap-6">
           {navLinks.map((link, idx) => {
-            const isTargetActive = isHome && activeSection === link.target && !link.isExternal;
+            const isTargetActive = link.isExternal
+              ? pathname === `/${link.target}` || pathname.startsWith(`/${link.target}/`)
+              : isHome && activeSection === link.target;
             const href = link.isExternal ? `/${link.target}` : `/#${link.target}`;
 
             return (
