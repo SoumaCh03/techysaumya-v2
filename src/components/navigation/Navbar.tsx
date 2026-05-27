@@ -120,9 +120,9 @@ export default function Navbar() {
             }
           }
         }}>
-          <h1 className="font-display font-extrabold text-lg md:text-xl tracking-tight text-white transition-all group-hover:text-cyan-accent group-hover:drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+          <span className="font-display font-extrabold text-lg md:text-xl tracking-tight text-white transition-all group-hover:text-cyan-accent group-hover:drop-shadow-[0_0_10px_rgba(0,240,255,0.4)] block">
             TechySaumya<span className="text-cyan-accent group-hover:text-white transition-colors font-sans">_v2.0</span>
-          </h1>
+          </span>
         </Link>
 
         {/* DESKTOP LINKS */}

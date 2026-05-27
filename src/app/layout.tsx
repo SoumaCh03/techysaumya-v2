@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s | TechySaumya",
   },
   description:
-    "Official portfolio of Saumyadeep Chakraborty (TechySaumya). Showcase of full stack systems engineering, backend architectures, custom AI/ML agents, scenic photography, and open motorcycle touring.",
+    "Full stack developer, photographer, and software engineer from West Bengal building premium digital experiences, scalable systems, AI solutions, and cinematic web products.",
   keywords: [
     "TechySaumya",
     "Saumyadeep Chakraborty",
