@@ -382,7 +382,7 @@ export default function ResumePage() {
                   Jai Hind
                 </h3>
                 <p className="text-text-secondary print:text-black/70 text-xs md:text-sm leading-relaxed mt-1 font-sans font-medium">
-                  Patriotic web project dedicated to India's 78th Independence celebrations featuring animated flags and css-art vectors.
+                  Patriotic web project dedicated to India&apos;s 78th Independence celebrations featuring animated flags and css-art vectors.
                 </p>
               </div>
 

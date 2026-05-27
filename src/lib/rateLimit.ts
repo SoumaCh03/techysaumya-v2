@@ -6,6 +6,7 @@ const rateLimitMap = new Map<string, RateLimitRecord>();
 
 // Run clean-up interval in Node.js runtime to prevent memory leaks
 if (typeof global !== "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const globalAny = global as any;
   if (!globalAny.rateLimitCleanupInterval) {
     globalAny.rateLimitCleanupInterval = setInterval(() => {

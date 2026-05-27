@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Code2, Globe } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useProviders } from "@/app/providers";
 import Image from "next/image";
 
