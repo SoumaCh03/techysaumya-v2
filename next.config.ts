@@ -71,7 +71,6 @@ const nextConfig: NextConfig = {
   // Exclude large paths from output file tracing (speeds up builds)
   outputFileTracingExcludes: {
     "*": [
-      "./node_modules/@swc/**/*",
       "./node_modules/terser/**/*",
       "./node_modules/webpack/**/*",
       "./node_modules/typescript/**/*",
