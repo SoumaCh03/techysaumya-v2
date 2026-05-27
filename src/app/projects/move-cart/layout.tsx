@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "MoveCart Case Study | High-Speed E-Commerce Shopping Flow",
-  description: "Detailed case study of MoveCart, a high-performance shopping cart catalog with Redux state synchronization, express backends, and transaction flows under 100ms.",
+  description: "Detailed case study of MoveCart, a high-speed shopping cart with Redux state synchronization, express backends, and transaction flows under 100ms.",
   alternates: {
     canonical: "/projects/move-cart",
   },

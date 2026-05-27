@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s | TechySaumya",
   },
   description:
-    "Full stack developer, photographer, and software engineer from West Bengal building premium digital experiences, scalable systems, AI solutions, and cinematic web products.",
+    "Full stack developer, photographer, and engineer from West Bengal building premium digital experiences, scalable systems, and cinematic web products.",
   keywords: [
     "TechySaumya",
     "Saumyadeep Chakraborty",

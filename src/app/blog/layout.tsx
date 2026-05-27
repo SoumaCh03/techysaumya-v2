@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Official Blog | TechySaumya Tech Chronicles",
-  description: "Insightful articles on full stack development, API designs, database management, Cloudinary optimization, and AI development written by Saumyadeep Chakraborty.",
+  description: "Insightful articles on full stack engineering, API designs, database management, performance optimization, and AI written by Saumyadeep Chakraborty.",
   alternates: {
     canonical: "/blog",
   },

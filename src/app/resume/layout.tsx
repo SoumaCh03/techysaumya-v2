@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Resume | Full Stack Systems Engineer",
-  description: "View the professional resume of Saumyadeep Chakraborty. Specializing in Node.js, Next.js, React, MongoDB, scalable systems engineering, and custom AI/ML agents.",
+  description: "View the professional resume of Saumyadeep Chakraborty. Specializing in React, Next.js, Node.js, MongoDB, scalable systems, and custom AI/ML agents.",
   alternates: {
     canonical: "/resume",
   },
