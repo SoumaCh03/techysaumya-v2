@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Blog & Technical Insights",
-  description:
-    "Explore development tutorials, systems engineering guides, motorcycle touring logs, and photography diaries by Saumyadeep Chakraborty (TechySaumya).",
-  keywords: [
-    "TechySaumya Blog",
-    "Saumyadeep Chakraborty Blog",
-    "programming tutorials",
-    "backend development logs",
-    "system architecture logs",
-    "motorcycle riding diaries",
-    "photography guides",
-  ],
+  title: "Official Blog | TechySaumya Tech Chronicles",
+  description: "Insightful articles on full stack development, API designs, database management, Cloudinary optimization, and AI development written by Saumyadeep Chakraborty.",
+  alternates: {
+    canonical: "/blog",
+  },
+  openGraph: {
+    type: "website",
+    title: "Official Blog | TechySaumya Tech Chronicles",
+    description: "Insightful articles on full stack development, API designs, database management, Cloudinary optimization, and AI development written by Saumyadeep Chakraborty.",
+    url: "/blog",
+    images: [
+      {
+        url: "/preview-image.png",
+        width: 1200,
+        height: 630,
+        alt: "TechySaumya Blog Chronicles Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Official Blog | TechySaumya Tech Chronicles",
+    description: "Articles on full stack development, API designs, database management, and AI development by Saumyadeep Chakraborty.",
+    images: ["/preview-image.png"],
+  },
 };
 
 export default function BlogLayout({

@@ -60,6 +60,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  verification: {
+    google: "googledc56d21eedf0c659.html",
+  },
   robots: {
     index: true,
     follow: true,
@@ -101,7 +104,7 @@ const jsonLdGraph = {
   "@graph": [
     {
       "@type": "Person",
-      "@id": "https://techysaumyadeep.vercel.app/#person",
+      "@id": "https://saumyadeepch.vercel.app/#person",
       "name": "Saumyadeep Chakraborty",
       "alternateName": [
         "Saumyadeep",
@@ -112,8 +115,8 @@ const jsonLdGraph = {
         "Saumyadeep Dev",
         "Saumya.dev",
       ],
-      "url": "https://techysaumyadeep.vercel.app/",
-      "image": "https://techysaumyadeep.vercel.app/saumyadeep-chakraborty-techysaumya-portrait.jpg",
+      "url": "https://saumyadeepch.vercel.app/",
+      "image": "https://saumyadeepch.vercel.app/saumyadeep-chakraborty-techysaumya-portrait.jpg",
       "jobTitle": ["Full Stack Developer", "Backend Engineer", "Photographer"],
       "description":
         "Saumyadeep Chakraborty is an Indian full stack developer, backend engineer, photographer, and motorcycle touring enthusiast known online as TechySaumya.",
@@ -146,21 +149,67 @@ const jsonLdGraph = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://techysaumyadeep.vercel.app/#website",
-      "url": "https://techysaumyadeep.vercel.app/",
+      "@id": "https://saumyadeepch.vercel.app/#website",
+      "url": "https://saumyadeepch.vercel.app/",
       "name": "TechySaumya",
       "publisher": {
-        "@id": "https://techysaumyadeep.vercel.app/#person",
+        "@id": "https://saumyadeepch.vercel.app/#person",
       },
+      "potentialAction": [
+        {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://saumyadeepch.vercel.app/blog?search={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      ]
     },
     {
       "@type": "ProfilePage",
-      "@id": "https://techysaumyadeep.vercel.app/#profilepage",
+      "@id": "https://saumyadeepch.vercel.app/#profilepage",
       "mainEntity": {
-        "@id": "https://techysaumyadeep.vercel.app/#person",
+        "@id": "https://saumyadeepch.vercel.app/#person",
       },
       "headline": "Saumyadeep Chakraborty | TechySaumya",
     },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://saumyadeepch.vercel.app/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://saumyadeepch.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Photography",
+          "item": "https://saumyadeepch.vercel.app/photography"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Journey",
+          "item": "https://saumyadeepch.vercel.app/journey"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Resume",
+          "item": "https://saumyadeepch.vercel.app/resume"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Blog",
+          "item": "https://saumyadeepch.vercel.app/blog"
+        }
+      ]
+    }
   ],
 };
 

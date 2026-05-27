@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongoose";
 import BlogPost from "@/models/BlogPost";
 import { isAuthorized } from "@/lib/auth";
+import { pingIndexNow } from "@/lib/indexnow";
 
 // 1. GET (Public & Admin): Retrieves blogs
 // Public reads published blogs, Admin reads all (drafts + published)
@@ -80,6 +81,12 @@ export async function POST(req: Request) {
       readingTime,
     });
 
+    if (newPost.status === "published") {
+      pingIndexNow([`/blog/${newPost.slug}`]).catch(err =>
+        console.error("IndexNow post-creation trigger failed:", err)
+      );
+    }
+
     return NextResponse.json({ success: true, post: newPost });
   } catch (e) {
     console.error("Blogs POST Error:", e);
@@ -129,6 +136,13 @@ export async function PUT(req: Request) {
     if (status !== undefined) post.status = status;
 
     await post.save();
+
+    if (post.status === "published") {
+      pingIndexNow([`/blog/${post.slug}`]).catch(err =>
+        console.error("IndexNow post-update trigger failed:", err)
+      );
+    }
+
     return NextResponse.json({ success: true, post });
   } catch (e) {
     console.error("Blogs PUT Error:", e);

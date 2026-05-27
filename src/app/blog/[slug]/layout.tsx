@@ -2,51 +2,121 @@ import type { Metadata } from "next";
 import { connectDB } from "@/lib/mongoose";
 import BlogPost from "@/models/BlogPost";
 
-interface Props {
-  params: Promise<{
-    slug: string;
-  }>;
+interface BlogLayoutProps {
+  children: React.ReactNode;
+  params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: BlogLayoutProps): Promise<Metadata> {
   const { slug } = await params;
+  
+  try {
+    await connectDB();
+    const post = await BlogPost.findOne({ slug, status: "published" }).lean();
+    if (!post) {
+      return {
+        title: "Blog Post Not Found | TechySaumya",
+        description: "The requested blog post could not be found.",
+      };
+    }
+
+    const title = `${post.title} | TechySaumya Blog`;
+    const description = post.summary || "Insightful tech article by Saumyadeep Chakraborty.";
+    const coverUrl = post.coverImage || "/preview-image.png";
+
+    return {
+      title,
+      description,
+      alternates: {
+        canonical: `/blog/${slug}`,
+      },
+      openGraph: {
+        type: "article",
+        title,
+        description,
+        url: `/blog/${slug}`,
+        publishedTime: post.createdAt ? new Date(post.createdAt).toISOString() : undefined,
+        modifiedTime: post.updatedAt ? new Date(post.updatedAt).toISOString() : undefined,
+        authors: ["Saumyadeep Chakraborty"],
+        tags: post.tags || [],
+        images: [
+          {
+            url: coverUrl,
+            width: 1200,
+            height: 630,
+            alt: post.title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [coverUrl],
+      },
+    };
+  } catch (e) {
+    console.error("Error generating metadata for blog post:", e);
+    return {
+      title: "Blog Post | TechySaumya",
+      description: "Articles and case studies on engineering and design.",
+    };
+  }
+}
+
+export default async function BlogPostLayout({
+  children,
+  params,
+}: BlogLayoutProps) {
+  const { slug } = await params;
+  let blogPostLd = null;
 
   try {
     await connectDB();
-    const post = await BlogPost.findOne({ slug, status: "published" }).select("title summary tags").lean();
-    
+    const post = await BlogPost.findOne({ slug, status: "published" }).lean();
     if (post) {
-      return {
-        title: `${post.title}`,
-        description: post.summary,
-        keywords: [...(post.tags || []), "TechySaumya Blog", "Saumyadeep Chakraborty Blog"],
-        openGraph: {
-          title: post.title,
-          description: post.summary,
-          type: "article",
-          url: `https://techysaumyadeep.vercel.app/blog/${slug}`,
+      blogPostLd = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": post.title,
+        "description": post.summary,
+        "image": post.coverImage || "https://saumyadeepch.vercel.app/preview-image.png",
+        "datePublished": post.createdAt ? new Date(post.createdAt).toISOString() : new Date().toISOString(),
+        "dateModified": post.updatedAt ? new Date(post.updatedAt).toISOString() : new Date().toISOString(),
+        "author": {
+          "@type": "Person",
+          "name": "Saumyadeep Chakraborty",
+          "url": "https://saumyadeepch.vercel.app/",
         },
-        twitter: {
-          card: "summary_large_image",
-          title: post.title,
-          description: post.summary,
-        }
+        "publisher": {
+          "@type": "Organization",
+          "name": "TechySaumya",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://saumyadeepch.vercel.app/favicon.svg",
+          },
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": `https://saumyadeepch.vercel.app/blog/${slug}`,
+        },
       };
     }
   } catch (e) {
-    console.error("Failed to generate metadata for blog post:", e);
+    console.error("Error creating JSON-LD for blog post:", e);
   }
 
-  return {
-    title: "Blog Post",
-    description: "Read the latest article on TechySaumya Logs.",
-  };
-}
-
-export default function BlogPostLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+  return (
+    <>
+      {blogPostLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostLd) }}
+        />
+      )}
+      {children}
+    </>
+  );
 }

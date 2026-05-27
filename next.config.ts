@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  trailingSlash: false,
   allowedDevOrigins: [
     "192.168.1.2",
   ],
@@ -23,7 +24,7 @@ const nextConfig: NextConfig = {
     formats: ["image/webp", "image/avif"],
   },
 
-  // ── Security Headers ────────────────────────────────────────
+  // ── Security & SEO Headers ──────────────────────────────────
   async headers() {
     return [
       {
@@ -48,6 +49,14 @@ const nextConfig: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Link",
+            value: "</sitemap.xml>; rel=\"sitemap\"",
           },
         ],
       },
