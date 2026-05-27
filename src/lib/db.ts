@@ -126,7 +126,7 @@ export async function getAlbums(): Promise<Album[]> {
     slug: a.slug,
     coverImage: a.coverImage,
     order: a.order,
-    images: (a.images || []).map((img: any) => ({
+    images: (a.images || []).map((img: Photo) => ({
       id: img.id,
       url: img.url,
       title: img.title,
@@ -155,7 +155,7 @@ export async function saveAlbums(albums: Album[]): Promise<boolean> {
           slug: a.slug,
           coverImage: a.coverImage,
           order: a.order,
-          images: (a.images || []).map((img: any) => ({
+          images: (a.images || []).map((img: Photo) => ({
             id: img.id,
             url: img.url,
             title: img.title,

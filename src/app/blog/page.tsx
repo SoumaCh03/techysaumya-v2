@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
-import { Search, Calendar, Clock, Tag, ArrowRight, Loader2, BookOpen } from "lucide-react";
+import { Search, Calendar, Clock, ArrowRight, BookOpen } from "lucide-react";
 
 interface BlogPost {
   _id: string;

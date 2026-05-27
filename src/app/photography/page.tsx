@@ -23,6 +23,12 @@ interface Album {
   images: Photo[];
 }
 
+function setWindowHash(hash: string) {
+  if (typeof window !== "undefined") {
+    window.location.hash = hash;
+  }
+}
+
 export default function PhotographyPage() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +70,7 @@ export default function PhotographyPage() {
 
   const selectAlbum = (album: Album) => {
     setActiveAlbum(album);
-    window.location.hash = album.slug;
+    setWindowHash(album.slug);
   };
 
   const openLightbox = (photo: Photo, index: number) => {

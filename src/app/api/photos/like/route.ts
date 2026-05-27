@@ -67,8 +67,8 @@ export async function POST(req: Request) {
           { $inc: { "images.$.likesCount": 1 } }
         );
         liked = true;
-      } catch (err: any) {
-        if (err.code === 11000) {
+      } catch (err: unknown) {
+        if (err && typeof err === "object" && "code" in err && err.code === 11000) {
           // Double submission / race condition: already liked
           liked = true;
         } else {
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 
     // Retrieve the updated likesCount from the database
     const updatedAlbum = await AlbumModel.findOne({ "images.id": photoId }).lean();
-    const photo = updatedAlbum?.images.find((img: any) => img.id === photoId);
+    const photo = updatedAlbum?.images.find((img: { id: string; likesCount?: number }) => img.id === photoId);
     const likesCount = photo?.likesCount || 0;
 
     return NextResponse.json({ success: true, liked, likesCount });

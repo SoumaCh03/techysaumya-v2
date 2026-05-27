@@ -30,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     await connectDB();
     const publishedPosts = await BlogPost.find({ status: "published" }).select("slug updatedAt").lean();
     
-    publishedPosts.forEach((post: any) => {
+    publishedPosts.forEach((post: { slug: string; updatedAt?: Date | string; createdAt?: Date | string }) => {
       sitemapEntries.push({
         url: `${baseUrl}/blog/${post.slug}`,
         lastModified: new Date(post.updatedAt || post.createdAt || Date.now()),

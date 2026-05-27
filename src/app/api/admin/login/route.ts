@@ -95,7 +95,7 @@ export async function GET() {
       return NextResponse.json({ authenticated: true });
     }
     return NextResponse.json({ authenticated: false }, { status: 401 });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ authenticated: false }, { status: 500 });
   }
 }
@@ -116,7 +116,7 @@ export async function DELETE() {
     
     cookieStore.delete("techysaumya_session");
     return NextResponse.json({ success: true, message: "Logged out." });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }

@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 
     // Single post lookup
     if (slug) {
-      const query: any = { slug };
+      const query: { slug: string; status?: "draft" | "published" } = { slug };
       if (!authorized) {
         query.status = "published";
       }
@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     }
 
     // List query
-    const query: any = {};
+    const query: { status?: "draft" | "published"; tags?: string } = {};
     if (!authorized) {
       query.status = "published";
     }

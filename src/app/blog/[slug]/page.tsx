@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
-import { Calendar, Clock, ArrowLeft, Share2, Tag, Loader2, Copy, Check } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, Share2, Check } from "lucide-react";
 
 interface BlogPost {
   title: string;

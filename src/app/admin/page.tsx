@@ -26,6 +26,24 @@ interface Album {
   images: Photo[];
 }
 
+interface Blog {
+  _id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  content: string;
+  coverImage: string;
+  tags: string[];
+  status: "draft" | "published";
+  readingTime: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+function generatePhotoId(): string {
+  return `photo-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+}
+
 interface UploadQueueItem {
   id: string;
   name: string;
@@ -166,7 +184,7 @@ export default function AdminPage() {
   const [editingPhotoTitle, setEditingPhotoTitle] = useState<string>("");
 
   // 4. Blog Data & Form States
-  const [blogs, setBlogs] = useState<any[]>([]);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
   const [blogEditorTab, setBlogEditorTab] = useState<"edit" | "preview">("edit");
@@ -216,50 +234,6 @@ export default function AdminPage() {
   };
 
   // 7. Authenticate & URL parameters on initial load
-  useEffect(() => {
-    async function checkSession() {
-      try {
-        const res = await fetch("/api/admin/login");
-        if (res.ok) {
-          const json = await res.json();
-          if (json.authenticated) {
-            setAuthenticated(true);
-            fetchAlbums();
-            fetchBlogs();
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setCheckingSession(false);
-      }
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("reset");
-    if (token) {
-      setResetToken(token);
-      setCurrentView("reset-password");
-      validateResetToken(token);
-      setCheckingSession(false);
-    } else {
-      checkSession();
-    }
-  }, []);
-
-  const validateResetToken = async (token: string) => {
-    setTokenChecking(true);
-    try {
-      const res = await fetch(`/api/admin/reset-password?token=${token}`);
-      const json = await res.json();
-      setTokenValid(json.valid);
-    } catch (e) {
-      setTokenValid(false);
-    } finally {
-      setTokenChecking(false);
-    }
-  };
-
   // Fetch data helpers
   const fetchAlbums = async () => {
     try {
@@ -285,12 +259,61 @@ export default function AdminPage() {
     }
   };
 
+  const validateResetToken = async (token: string) => {
+    setTokenChecking(true);
+    try {
+      const res = await fetch(`/api/admin/reset-password?token=${token}`);
+      const json = await res.json();
+      setTokenValid(json.valid);
+    } catch (e) {
+      setTokenValid(false);
+    } finally {
+      setTokenChecking(false);
+    }
+  };
+
+  // 7. Authenticate & URL parameters on initial load
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/admin/login");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.authenticated) {
+            setAuthenticated(true);
+            fetchAlbums();
+            fetchBlogs();
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setCheckingSession(false);
+      }
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("reset");
+    if (token) {
+      Promise.resolve().then(() => {
+        setResetToken(token);
+        setCurrentView("reset-password");
+        validateResetToken(token);
+        setCheckingSession(false);
+      });
+    } else {
+      checkSession();
+    }
+  }, []);
+
   // Synchronize album config states when selected album changes
   useEffect(() => {
     if (selectedAlbum) {
-      setEditTitle(selectedAlbum.title);
-      setEditDesc(selectedAlbum.description);
-      setEditSlug(selectedAlbum.slug);
+      Promise.resolve().then(() => {
+        setEditTitle(selectedAlbum.title);
+        setEditDesc(selectedAlbum.description);
+        setEditSlug(selectedAlbum.slug);
+      });
     }
   }, [selectedAlbum]);
 
@@ -649,7 +672,7 @@ export default function AdminPage() {
         const cloudUrl = await uploadFileWithXmlHttp(file, item.id);
         
         const newPhoto: Photo = {
-          id: `photo-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          id: generatePhotoId(),
           url: cloudUrl,
           title: file.name.split(".")[0] || "Photo",
           order: albumImages.length + 1,
@@ -677,8 +700,9 @@ export default function AdminPage() {
 
   const handleSetCover = async (photoUrl: string) => {
     if (!selectedAlbum) return;
-    selectedAlbum.coverImage = photoUrl;
-    await updateSingleAlbum(selectedAlbum);
+    const updatedAlbum = { ...selectedAlbum, coverImage: photoUrl };
+    setSelectedAlbum(updatedAlbum);
+    await updateSingleAlbum(updatedAlbum);
     showAlert("Cover Set", "Album cover image updated successfully.");
   };
 
@@ -689,10 +713,10 @@ export default function AdminPage() {
       "Are you sure you want to remove this photo from the album?",
       async () => {
         const filtered = selectedAlbum.images.filter((img) => img.id !== photoId);
-        selectedAlbum.images = filtered.map((img, idx) => ({ ...img, order: idx + 1 }));
-        
-        setSelectedAlbum({ ...selectedAlbum });
-        await updateSingleAlbum(selectedAlbum);
+        const updatedImages = filtered.map((img, idx) => ({ ...img, order: idx + 1 }));
+        const updatedAlbum = { ...selectedAlbum, images: updatedImages };
+        setSelectedAlbum(updatedAlbum);
+        await updateSingleAlbum(updatedAlbum);
       }
     );
   };
@@ -741,9 +765,10 @@ export default function AdminPage() {
     reordered[index] = reordered[newIndex];
     reordered[newIndex] = temp;
 
-    selectedAlbum.images = reordered.map((img, idx) => ({ ...img, order: idx + 1 }));
-    setSelectedAlbum({ ...selectedAlbum });
-    await updateSingleAlbum(selectedAlbum);
+    const updatedImages = reordered.map((img, idx) => ({ ...img, order: idx + 1 }));
+    const updatedAlbum = { ...selectedAlbum, images: updatedImages };
+    setSelectedAlbum(updatedAlbum);
+    await updateSingleAlbum(updatedAlbum);
   };
 
   const handlePhotoDragStart = (e: React.DragEvent, index: number) => {
@@ -819,7 +844,7 @@ export default function AdminPage() {
     setShowAddBlog(true);
   };
 
-  const handleStartEditBlog = (blog: any) => {
+  const handleStartEditBlog = (blog: Blog) => {
     setEditingBlogId(blog._id);
     setBlogTitle(blog.title);
     setBlogSlug(blog.slug);
@@ -1823,7 +1848,7 @@ export default function AdminPage() {
                 <div className="w-full py-20 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center text-text-secondary">
                   <FileText className="w-12 h-12 text-white/15 mb-3" />
                   <p className="font-sans font-semibold text-white/60">No blog posts found in MongoDB.</p>
-                  <p className="text-xs mt-1 font-sans font-medium">Click "Write Blog" at the top to publish your first article.</p>
+                  <p className="text-xs mt-1 font-sans font-medium">Click &quot;Write Blog&quot; at the top to publish your first article.</p>
                 </div>
               ) : (
                 <div className="glass-panel border-white/5 rounded-2xl overflow-hidden shadow-2xl">
@@ -2127,7 +2152,7 @@ export default function AdminPage() {
                       <label className="text-[10px] font-semibold uppercase tracking-wider text-text-secondary pl-1">Publication Status</label>
                       <select
                         value={blogStatus}
-                        onChange={(e: any) => setBlogStatus(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setBlogStatus(e.target.value as "draft" | "published")}
                         className="w-full px-3 py-2 rounded-xl border border-white/10 bg-[#0c0c0e] text-white outline-none focus:border-cyan-accent/30 text-xs font-sans"
                       >
                         <option value="draft">Draft (Private)</option>
