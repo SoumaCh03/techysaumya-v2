@@ -1,4 +1,4 @@
-# 🌌 TechySaumya v2 — Full Stack Developer Portfolio & Publishing Platform
+# TechySaumya v2 — Full Stack Developer Portfolio & Publishing Platform
 
 <div align="center">
 
