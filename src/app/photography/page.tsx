@@ -38,6 +38,25 @@ export default function PhotographyPage() {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number>(-1);
 
+  const [animatingLikes, setAnimatingLikes] = useState<Record<string, boolean>>({});
+
+  const triggerLikeAnimation = (photoId: string) => {
+    setAnimatingLikes((prev) => ({ ...prev, [photoId]: true }));
+    setTimeout(() => {
+      setAnimatingLikes((prev) => {
+        const next = { ...prev };
+        delete next[photoId];
+        return next;
+      });
+    }, 800);
+  };
+
+  const handleDoubleClick = (e: React.MouseEvent, photoId: string) => {
+    e.stopPropagation();
+    handleLikeToggle(e, photoId);
+    triggerLikeAnimation(photoId);
+  };
+
   useEffect(() => {
     async function fetchAlbums() {
       try {
@@ -285,6 +304,7 @@ export default function PhotographyPage() {
                 <div
                   key={photo.id || idx}
                   onClick={() => openLightbox(photo, idx)}
+                  onDoubleClick={(e) => handleDoubleClick(e, photo.id)}
                   onContextMenu={(e) => e.preventDefault()}
                   onDragStart={(e) => e.preventDefault()}
                   className="group relative rounded-2xl overflow-hidden aspect-square border border-white/5 bg-black/60 shadow-2xl cursor-pointer hover:border-amber-accent/35 transition-all duration-300"
@@ -297,6 +317,13 @@ export default function PhotographyPage() {
                     onDragStart={(e) => e.preventDefault()}
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 opacity-80 group-hover:opacity-95 select-none pointer-events-none -webkit-user-select-none -webkit-touch-callout-none touch-action-none"
                   />
+
+                  {/* Large Heart Animation Overlay in Grid */}
+                  {animatingLikes[photo.id] && (
+                    <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+                      <Heart className="w-16 h-16 fill-white text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.5)] animate-heart-pop" />
+                    </div>
+                  )}
                   
                   {/* Glassmorphic Like Button */}
                   <button
@@ -355,13 +382,25 @@ export default function PhotographyPage() {
 
           {/* Main Image Aspect Ratio */}
           <div className="relative max-w-4xl max-h-[80vh] w-full h-full flex flex-col items-center justify-center">
-            <img
-              src={lightboxPhoto.url}
-              alt={lightboxPhoto.title}
-              onContextMenu={(e) => e.preventDefault()}
-              onDragStart={(e) => e.preventDefault()}
-              className="max-w-full max-h-[72vh] object-contain rounded-lg shadow-2xl select-none pointer-events-none -webkit-user-select-none -webkit-touch-callout-none touch-action-none"
-            />
+            <div 
+              className="relative cursor-pointer select-none flex items-center justify-center"
+              onDoubleClick={(e) => handleDoubleClick(e, lightboxPhoto.id)}
+            >
+              <img
+                src={lightboxPhoto.url}
+                alt={lightboxPhoto.title}
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                className="max-w-full max-h-[72vh] object-contain rounded-lg shadow-2xl select-none pointer-events-none -webkit-user-select-none -webkit-touch-callout-none touch-action-none"
+              />
+
+              {/* Large Heart Animation Overlay in Lightbox */}
+              {animatingLikes[lightboxPhoto.id] && (
+                <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none animate-in zoom-in-50 duration-200">
+                  <Heart className="w-20 h-20 fill-white text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.6)] animate-heart-pop" />
+                </div>
+              )}
+            </div>
             {/* Title details at bottom */}
             <div className="mt-4 text-center flex flex-col items-center gap-2 select-none">
               <span className="text-white font-sans text-xs font-bold tracking-wider uppercase">
