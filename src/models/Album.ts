@@ -5,6 +5,7 @@ export interface IPhoto {
   url: string;
   title: string;
   order: number;
+  likesCount?: number;
 }
 
 export interface IAlbum extends Document {
@@ -19,10 +20,11 @@ export interface IAlbum extends Document {
 
 const PhotoSchema = new Schema<IPhoto>(
   {
-    id:    { type: String, required: true },
-    url:   { type: String, required: true },
-    title: { type: String, required: true, default: "Photo" },
-    order: { type: Number, required: true },
+    id:          { type: String, required: true },
+    url:         { type: String, required: true },
+    title:       { type: String, required: true, default: "Photo" },
+    order:       { type: Number, required: true },
+    likesCount:  { type: Number, default: 0 },
   },
   { _id: false }
 );

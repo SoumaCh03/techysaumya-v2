@@ -128,9 +128,10 @@ export default function Navbar() {
         {/* DESKTOP LINKS */}
         <div className="hidden lg:flex items-center gap-3.5 lg:gap-4 xl:gap-5">
           {navLinks.map((link, idx) => {
-            const isTargetActive = link.isExternal
-              ? pathname === `/${link.target}` || pathname.startsWith(`/${link.target}/`)
-              : isHome && activeSection === link.target;
+            const isTargetActive = isHome
+              ? activeSection === link.target
+              : (link.isExternal || link.target === "projects") &&
+                (pathname === `/${link.target}` || pathname.startsWith(`/${link.target}/`));
             const href = link.isExternal ? `/${link.target}` : `/#${link.target}`;
 
             return (
@@ -138,13 +139,15 @@ export default function Navbar() {
                 key={idx}
                 href={href}
                 onClick={(e) => handleNavClick(e, link)}
-                className={`relative text-[11px] lg:text-[12px] xl:text-[13px] font-semibold tracking-wider uppercase transition-colors duration-300 hover:text-white ${
-                  isTargetActive ? "text-cyan-accent" : "text-text-secondary"
+                className={`relative text-[11px] lg:text-[12px] xl:text-[13px] font-semibold tracking-wider uppercase transition-all duration-300 hover:text-white ${
+                  isTargetActive 
+                    ? "text-cyan-accent [text-shadow:0_0_8px_rgba(0,240,255,0.6)]" 
+                    : "text-text-secondary"
                 }`}
               >
                 {link.label}
                 {isTargetActive && (
-                  <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-cyan-accent rounded-full shadow-[0_0_8px_cyan]" />
+                  <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-cyan-accent rounded-full shadow-[0_0_10px_rgba(0,240,255,0.8)]" />
                 )}
               </Link>
             );
@@ -196,9 +199,10 @@ export default function Navbar() {
 
         <div className="flex flex-col gap-6">
           {navLinks.map((link, idx) => {
-            const isTargetActive = link.isExternal
-              ? pathname === `/${link.target}` || pathname.startsWith(`/${link.target}/`)
-              : isHome && activeSection === link.target;
+            const isTargetActive = isHome
+              ? activeSection === link.target
+              : (link.isExternal || link.target === "projects") &&
+                (pathname === `/${link.target}` || pathname.startsWith(`/${link.target}/`));
             const href = link.isExternal ? `/${link.target}` : `/#${link.target}`;
 
             return (
@@ -206,8 +210,10 @@ export default function Navbar() {
                 key={idx}
                 href={href}
                 onClick={(e) => handleNavClick(e, link)}
-                className={`text-[15px] font-semibold uppercase tracking-wide transition-colors ${
-                  isTargetActive ? "text-cyan-accent" : "text-text-secondary"
+                className={`text-[15px] font-semibold uppercase tracking-wide transition-all ${
+                  isTargetActive 
+                    ? "text-cyan-accent [text-shadow:0_0_8px_rgba(0,240,255,0.6)]" 
+                    : "text-text-secondary"
                 }`}
               >
                 {link.label}

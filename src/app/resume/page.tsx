@@ -235,6 +235,21 @@ export default function ResumePage() {
                 </span>
               </div>
 
+              {/* PG Diploma */}
+              <div className="print-card flex justify-between items-start flex-wrap gap-2">
+                <div>
+                  <h3 className="font-display font-bold text-sm md:text-base text-white print:text-black">
+                    PG Diploma in Graphics Design, Website Development &amp; .NET Technologies
+                  </h3>
+                  <p className="text-xs font-semibold text-text-secondary print:text-black/70 mt-0.5">
+                    MAKAUT (formerly WBUT)
+                  </p>
+                </div>
+                <span className="text-xs font-mono font-bold text-text-muted print:text-black/60">
+                  2018 - 2020
+                </span>
+              </div>
+
               {/* Item 4 */}
               <div className="print-card flex justify-between items-start flex-wrap gap-2">
                 <div>

@@ -33,11 +33,53 @@ export async function uploadImage(fileBuffer: Buffer, fileName: string, mimeType
   try {
     // Only attempt conversion if the file is indeed an image
     if (mimeType.startsWith("image/")) {
-      webpBuffer = await sharp(fileBuffer)
-        .webp({ quality: 85 })
-        .toBuffer();
+      // 1. Initialize sharp pipeline with auto-rotation (applies orientation before stripping EXIF metadata)
+      let pipeline = sharp(fileBuffer).rotate();
+
+      // Read dimensions for adaptive resizing
+      const metadata = await pipeline.metadata();
+      const width = metadata.width || 0;
+      const height = metadata.height || 0;
+
+      if (width > 0 && height > 0) {
+        if (width > height) {
+          // Landscape: max width 1920px
+          if (width > 1920) {
+            pipeline = pipeline.resize({ width: 1920, fit: "inside", withoutEnlargement: true });
+          }
+        } else {
+          // Portrait or Square: max height 1600px
+          if (height > 1600) {
+            pipeline = pipeline.resize({ height: 1600, fit: "inside", withoutEnlargement: true });
+          }
+        }
+      }
+
+      // 2. Adaptive Quality Tuning Loop (Target <= 450KB, Hard Floor quality = 68)
+      const qualities = [85, 80, 75, 70, 68];
+      let bestBuffer: Buffer | null = null;
+
+      for (const q of qualities) {
+        // Clone pipeline to prevent stream consumption issues across iterations
+        const tempBuffer = await pipeline.clone().webp({ quality: q }).toBuffer();
+        
+        // Stop if the file size satisfies our 450KB limit
+        if (tempBuffer.length <= 450 * 1024) {
+          bestBuffer = tempBuffer;
+          break;
+        }
+
+        // Fallback to quality 68 if we reach the hard floor and still exceed the limit
+        if (q === 68) {
+          bestBuffer = tempBuffer;
+        }
+      }
+
+      if (bestBuffer) {
+        webpBuffer = bestBuffer;
+      }
+
       targetMimeType = "image/webp";
-      
       const parsedName = path.parse(fileName);
       targetFileName = `${parsedName.name}.webp`;
     }

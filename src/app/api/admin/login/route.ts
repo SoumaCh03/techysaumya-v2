@@ -5,10 +5,32 @@ import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongoose";
 import Admin, { ensureAdminExists } from "@/models/Admin";
 import { isAuthorized } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
   try {
     await ensureAdminExists(); // Auto-seed if first run
+
+    // 1. IP-based rate limiting (5 attempts per 15 minutes)
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || 
+               req.headers.get("x-real-ip") || 
+               "127.0.0.1";
+    
+    const limitResult = rateLimit(ip, 5, 15 * 60 * 1000);
+    if (!limitResult.success) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: `Too many login attempts. Please try again in ${limitResult.reset} seconds.` 
+        },
+        { 
+          status: 429,
+          headers: {
+            "Retry-After": limitResult.reset.toString()
+          }
+        }
+      );
+    }
 
     const { username, password } = await req.json();
 

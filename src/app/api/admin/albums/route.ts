@@ -1,18 +1,46 @@
 import { NextResponse } from "next/server";
 import { getAlbums, saveAlbums, Album } from "@/lib/db";
 import { isAuthorized } from "@/lib/auth";
+import crypto from "crypto";
+import PhotoLike from "@/models/PhotoLike";
+import { connectDB } from "@/lib/mongoose";
 
-// 1. GET (Public): Returns all albums ordered
-export async function GET() {
+// 1. GET (Public): Returns all albums ordered, dynamically joining liked state based on requester fingerprint
+export async function GET(req: Request) {
   try {
     const albums = await getAlbums();
+    
     // Sort albums by order index
     const sortedAlbums = [...albums].sort((a, b) => a.order - b.order);
     
-    // Sort images within each album by order index
+    // Extract headers for device fingerprinting
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "127.0.0.1";
+    const userAgent = req.headers.get("user-agent") || "";
+    const acceptLanguage = req.headers.get("accept-language") || "";
+    
+    const rawString = `${ip}-${userAgent}-${acceptLanguage}`;
+    const fingerprintHash = crypto.createHash("sha256").update(rawString).digest("hex");
+    
+    // Gather all photo IDs
+    const allPhotoIds = sortedAlbums.flatMap((album) => (album.images || []).map((img) => img.id));
+    
+    // Connect to DB and query likes for the current fingerprint
+    await connectDB();
+    const likedPhotos = await PhotoLike.find({
+      photoId: { $in: allPhotoIds },
+      fingerprintHash,
+    }).distinct("photoId");
+    
+    const likedPhotoIds = new Set(likedPhotos);
+
+    // Sort images within each album and merge dynamic liked state
     sortedAlbums.forEach((album) => {
       if (album.images) {
         album.images.sort((a, b) => a.order - b.order);
+        album.images = album.images.map((img) => ({
+          ...img,
+          liked: likedPhotoIds.has(img.id),
+        }));
       }
     });
 

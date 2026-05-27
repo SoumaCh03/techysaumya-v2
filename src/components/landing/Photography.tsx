@@ -88,7 +88,8 @@ export default function PhotographyPreview() {
               <Link
                 key={album.id || album.slug}
                 href={`/photography#${album.slug}`}
-
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
                 className="group relative h-96 rounded-2xl overflow-hidden border border-white/5 bg-black shadow-2xl flex flex-col justify-end p-6 hover:border-amber-accent/35 transition-all duration-500"
               >
                 {/* Image background with zoom on hover */}
@@ -96,7 +97,9 @@ export default function PhotographyPreview() {
                   <img
                     src={album.coverImage}
                     alt={album.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-60 group-hover:opacity-75"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-60 group-hover:opacity-75 select-none pointer-events-none -webkit-user-select-none -webkit-touch-callout-none touch-action-none"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
                 </div>

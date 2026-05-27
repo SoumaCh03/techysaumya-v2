@@ -6,6 +6,7 @@ export interface Photo {
   url: string;
   title: string;
   order: number;
+  likesCount?: number;
 }
 
 export interface Album {
@@ -125,11 +126,12 @@ export async function getAlbums(): Promise<Album[]> {
     slug: a.slug,
     coverImage: a.coverImage,
     order: a.order,
-    images: (a.images || []).map((img) => ({
+    images: (a.images || []).map((img: any) => ({
       id: img.id,
       url: img.url,
       title: img.title,
       order: img.order,
+      likesCount: img.likesCount || 0,
     })),
   }));
 }
@@ -153,11 +155,12 @@ export async function saveAlbums(albums: Album[]): Promise<boolean> {
           slug: a.slug,
           coverImage: a.coverImage,
           order: a.order,
-          images: (a.images || []).map((img) => ({
+          images: (a.images || []).map((img: any) => ({
             id: img.id,
             url: img.url,
             title: img.title,
             order: img.order,
+            likesCount: img.likesCount || 0,
           })),
         },
         { upsert: true, new: true }

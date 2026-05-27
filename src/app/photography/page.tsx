@@ -2,13 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Camera, X, ArrowLeft as ChevronLeft, ArrowRight as ChevronRight, Calendar } from "lucide-react";
+import { ArrowLeft, MapPin, Camera, X, ArrowLeft as ChevronLeft, ArrowRight as ChevronRight, Calendar, Heart } from "lucide-react";
 
 interface Photo {
   id: string;
   url: string;
   title: string;
   order: number;
+  liked?: boolean;
+  likesCount?: number;
 }
 
 interface Album {
@@ -85,6 +87,84 @@ export default function PhotographyPage() {
 
     setLightboxIndex(nextIdx);
     setLightboxPhoto(activeAlbum.images[nextIdx]);
+  };
+
+  const handleLikeToggle = async (e: React.MouseEvent, photoId: string) => {
+    e.stopPropagation(); // Prevent opening lightbox
+
+    if (!activeAlbum) return;
+
+    // Optimistically update active album photos list
+    const updatedImages = activeAlbum.images.map((photo) => {
+      if (photo.id === photoId) {
+        const isLiked = !photo.liked;
+        return {
+          ...photo,
+          liked: isLiked,
+          likesCount: Math.max(0, (photo.likesCount || 0) + (isLiked ? 1 : -1)),
+        };
+      }
+      return photo;
+    });
+
+    const updatedActiveAlbum = { ...activeAlbum, images: updatedImages };
+    setActiveAlbum(updatedActiveAlbum);
+    setAlbums((prev) =>
+      prev.map((alb) => (alb.id === activeAlbum.id ? updatedActiveAlbum : alb))
+    );
+
+    // Sync localStorage list
+    try {
+      const stored = localStorage.getItem("liked_photos");
+      let likedList: string[] = stored ? JSON.parse(stored) : [];
+      const isNowLiked = updatedImages.find((img) => img.id === photoId)?.liked;
+      
+      if (isNowLiked) {
+        if (!likedList.includes(photoId)) likedList.push(photoId);
+      } else {
+        likedList = likedList.filter((id) => id !== photoId);
+      }
+      localStorage.setItem("liked_photos", JSON.stringify(likedList));
+    } catch (err) {
+      console.error(err);
+    }
+
+    // Call API toggle
+    try {
+      const res = await fetch("/api/photos/like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photoId }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        
+        // Sync final values from server
+        const syncedImages = updatedImages.map((photo) => {
+          if (photo.id === photoId) {
+            return {
+              ...photo,
+              liked: data.liked,
+              likesCount: data.likesCount,
+            };
+          }
+          return photo;
+        });
+
+        const syncedActiveAlbum = { ...activeAlbum, images: syncedImages };
+        setActiveAlbum(syncedActiveAlbum);
+        setAlbums((prev) =>
+          prev.map((alb) => (alb.id === activeAlbum.id ? syncedActiveAlbum : alb))
+        );
+
+        if (lightboxPhoto && lightboxPhoto.id === photoId) {
+          setLightboxPhoto((prev) => prev ? { ...prev, liked: data.liked, likesCount: data.likesCount } : null);
+        }
+      }
+    } catch (err) {
+      console.error("API like failed:", err);
+    }
   };
 
   return (
@@ -199,17 +279,39 @@ export default function PhotographyPage() {
                 <div
                   key={photo.id || idx}
                   onClick={() => openLightbox(photo, idx)}
-
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
                   className="group relative rounded-2xl overflow-hidden aspect-square border border-white/5 bg-black/60 shadow-2xl cursor-pointer hover:border-amber-accent/35 transition-all duration-300"
                 >
                   <img
                     src={photo.url}
                     alt={photo.title}
                     loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 opacity-80 group-hover:opacity-95"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 opacity-80 group-hover:opacity-95 select-none pointer-events-none -webkit-user-select-none -webkit-touch-callout-none touch-action-none"
                   />
+                  
+                  {/* Glassmorphic Like Button */}
+                  <button
+                    onClick={(e) => handleLikeToggle(e, photo.id)}
+                    className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 hover:border-amber-accent/30 text-text-secondary hover:text-white transition-all duration-300 active:scale-95 group/like"
+                    title={photo.liked ? "Unlike photo" : "Like photo"}
+                  >
+                    <Heart
+                      className={`w-3.5 h-3.5 transition-all duration-300 ${
+                        photo.liked
+                          ? "fill-red-500 text-red-500 scale-110 drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]"
+                          : "text-text-secondary group-hover:text-white group-hover:scale-110"
+                      }`}
+                    />
+                    <span className="text-[10px] font-mono font-bold leading-none select-none">
+                      {photo.likesCount || 0}
+                    </span>
+                  </button>
+
                   {/* Photo Title Overlay on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5 select-none pointer-events-none">
                     <span className="text-white font-sans text-xs font-semibold tracking-wide uppercase">
                       {photo.title}
                     </span>
@@ -224,7 +326,10 @@ export default function PhotographyPage() {
 
       {/* Lightbox Modal */}
       {lightboxPhoto && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-200">
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-200"
+          onContextMenu={(e) => e.preventDefault()}
+        >
           
           {/* Close trigger */}
           <button
@@ -247,13 +352,38 @@ export default function PhotographyPage() {
             <img
               src={lightboxPhoto.url}
               alt={lightboxPhoto.title}
-              className="max-w-full max-h-[72vh] object-contain rounded-lg shadow-2xl select-none"
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              className="max-w-full max-h-[72vh] object-contain rounded-lg shadow-2xl select-none pointer-events-none -webkit-user-select-none -webkit-touch-callout-none touch-action-none"
             />
             {/* Title details at bottom */}
-            <div className="mt-4 text-center">
+            <div className="mt-4 text-center flex flex-col items-center gap-2 select-none">
               <span className="text-white font-sans text-xs font-bold tracking-wider uppercase">
                 {lightboxPhoto.title}
               </span>
+
+              {/* Lightbox Like Button */}
+              <button
+                onClick={(e) => handleLikeToggle(e, lightboxPhoto.id)}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-amber-accent/30 text-text-secondary hover:text-white transition-all duration-300 active:scale-95 group/like-lb"
+                title={
+                  activeAlbum?.images.find((img) => img.id === lightboxPhoto.id)?.liked
+                    ? "Unlike photo"
+                    : "Like photo"
+                }
+              >
+                <Heart
+                  className={`w-4 h-4 transition-all duration-300 ${
+                    activeAlbum?.images.find((img) => img.id === lightboxPhoto.id)?.liked
+                      ? "fill-red-500 text-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+                      : "text-text-secondary group-hover:text-white group-hover:scale-110"
+                  }`}
+                />
+                <span className="text-xs font-mono font-bold leading-none select-none">
+                  {activeAlbum?.images.find((img) => img.id === lightboxPhoto.id)?.likesCount || 0}
+                </span>
+              </button>
+
               <p className="text-text-muted text-[10px] font-mono mt-1">
                 IMAGE {lightboxIndex + 1} OF {activeAlbum?.images?.length || 0}
               </p>

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Code2, Globe } from "lucide-react";
 import { useProviders } from "@/app/providers";
+import Image from "next/image";
 
 export default function Hero() {
   const originalText = "TECHYSAUMYA";
@@ -146,9 +147,12 @@ export default function Hero() {
 
         {/* Profile portrait frame */}
         <div className="relative w-[66%] h-[66%] rounded-full overflow-hidden border-4 border-cyan-accent/30 shadow-[0_0_40px_rgba(0,240,255,0.25)] bg-bg-surface z-10 group">
-          <img
+          <Image
             src="/saumyadeep-chakraborty-techysaumya-portrait.jpg"
             alt="Saumyadeep Chakraborty portrait"
+            width={340}
+            height={340}
+            priority
             className="w-full h-full object-cover scale-102 transition-transform duration-700 group-hover:scale-108"
           />
         </div>
