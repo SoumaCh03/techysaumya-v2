@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Saumyadeep Chakraborty" }],
   creator: "Saumyadeep Chakraborty",
-  metadataBase: new URL("https://techysaumyadeep.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app"),
   alternates: {
     canonical: "/",
   },
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://techysaumyadeep.vercel.app",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app",
     title: "Saumyadeep Chakraborty | TechySaumya | Full Stack Developer",
     description:
       "Official portfolio of Saumyadeep Chakraborty (TechySaumya) showcasing high-performance backend systems, AI agents, photography, and motorcycle touring.",
