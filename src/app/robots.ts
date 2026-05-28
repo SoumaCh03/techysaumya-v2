@@ -7,7 +7,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        allow: [
+          "/",
+          "/api/admin/albums",
+          "/api/admin/blogs",
+        ],
         disallow: [
           "/admin",
           "/api",
@@ -17,7 +21,11 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: ["Googlebot", "Bingbot"],
-        allow: "/",
+        allow: [
+          "/",
+          "/api/admin/albums",
+          "/api/admin/blogs",
+        ],
         disallow: [
           "/admin",
           "/api",
@@ -25,7 +33,11 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: ["YandexBot", "Baiduspider"],
-        allow: "/",
+        allow: [
+          "/",
+          "/api/admin/albums",
+          "/api/admin/blogs",
+        ],
         disallow: [
           "/admin",
           "/api",
