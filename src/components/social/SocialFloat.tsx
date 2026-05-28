@@ -5,7 +5,24 @@ import Link from "next/link";
 import { FaWhatsapp, FaTelegramPlane, FaFileAlt } from "react-icons/fa";
 
 export default function SocialFloat() {
-  const defaultMessage = "Hi, I'm Saumyadeep. Glad to see you here. How may I help you today?";
+  const [mounted, setMounted] = React.useState(false);
+  const [greeting, setGreeting] = React.useState("Good Day");
+
+  React.useEffect(() => {
+    setMounted(true);
+    // Dynamically calculate greeting based on client browser local time
+    const hr = new Date().getHours();
+    if (hr >= 5 && hr < 12) {
+      setGreeting("Good Morning");
+    } else if (hr >= 12 && hr < 17) {
+      setGreeting("Good Afternoon");
+    } else {
+      setGreeting("Good Evening");
+    }
+  }, []);
+
+  const currentGreeting = mounted ? greeting : "Good Day";
+  const defaultMessage = `Hi, Saumyadeep (${currentGreeting}). I'm [Your Name]. Glad to be here. Can we start a chat?`;
   
   const baseWhatsapp = process.env.NEXT_PUBLIC_WHATSAPP_URL || "https://wa.me/919647084566";
   const whatsappUrl = baseWhatsapp.includes("text=") 
