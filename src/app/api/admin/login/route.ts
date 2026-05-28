@@ -11,12 +11,12 @@ export async function POST(req: Request) {
   try {
     await ensureAdminExists(); // Auto-seed if first run
 
-    // 1. IP-based rate limiting (5 attempts per 15 minutes)
+    // 1. IP-based rate limiting (8 attempts per 15 minutes)
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || 
                req.headers.get("x-real-ip") || 
                "127.0.0.1";
     
-    const limitResult = rateLimit(ip, 5, 15 * 60 * 1000);
+    const limitResult = rateLimit(ip, 8, 15 * 60 * 1000);
     if (!limitResult.success) {
       return NextResponse.json(
         { 
