@@ -112,6 +112,28 @@ export default function SocialFloat() {
             box-shadow: 0 0 0 0 rgba(0, 240, 255, 0);
           }
         }
+
+        @media (max-width: 768px) {
+          .social-float-container {
+            bottom: 16px;
+            right: 16px;
+            gap: 10px;
+          }
+          .social-btn {
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+          }
+          .social-btn-resume {
+            font-size: 17px;
+          }
+        }
+
+        @media print {
+          .social-float-container {
+            display: none !important;
+          }
+        }
       `}</style>
       <div className="social-float-container">
         {/* Resume Button */}
