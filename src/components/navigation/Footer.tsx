@@ -117,10 +117,10 @@ export default function Footer() {
       {/* FOOTER DETAILS & SIGNATURE */}
       <div className="max-w-7xl mx-auto border-t border-white/5 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <p className="text-xs md:text-sm text-text-secondary font-medium font-sans text-center md:text-left">
-          Saumyadeep Chakraborty (TechySaumya) — Full Stack Developer, Photographer & Motorcycle Rider.
+          Saumyadeep Chakraborty (TechySaumya) — Full Stack Developer, Backend Engineering Enthusiast, Photographer, Creative Technologist & Motorcycle Rider based in West Bengal, India.
         </p>
         <p className="text-xs text-text-muted font-sans font-medium text-center md:text-right">
-          © {currentYear} TechySaumya. All Rights Reserved. Crafted with Next.js & Tailwind CSS.
+          © {currentYear} TechySaumya. All Rights Reserved. Crafted with ❤️ and Next.js & Tailwind CSS.
         </p>
       </div>
     </footer>
