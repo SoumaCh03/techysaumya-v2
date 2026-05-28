@@ -22,7 +22,7 @@ export default function SocialFloat() {
   }, []);
 
   const currentGreeting = mounted ? greeting : "Good Day";
-  const defaultMessage = `Hi, Saumyadeep (${currentGreeting}). I'm [Your Name]. Glad to be here. Can we start a chat?`;
+  const defaultMessage = `Hi, Saumyadeep, ${currentGreeting}. I'm [Your Name]. Glad to be here. Can we start a chat?`;
   
   const baseWhatsapp = process.env.NEXT_PUBLIC_WHATSAPP_URL || "https://wa.me/919647084566";
   const whatsappUrl = baseWhatsapp.includes("text=") 
