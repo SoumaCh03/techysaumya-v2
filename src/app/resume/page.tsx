@@ -45,24 +45,24 @@ export default function ResumePage() {
       <main className="max-w-4xl mx-auto bg-bg-surface/30 backdrop-blur-md border border-white/5 rounded-3xl p-6 md:p-12 shadow-2xl print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
         
         {/* Contact Info Header */}
-        <header className="border-b border-white/5 print:border-black/10 pb-8 mb-8 text-center md:text-left flex flex-col md:flex-row justify-between items-start gap-6">
-          <div>
+        <header className="border-b border-white/5 print:border-black/10 pb-8 mb-8 text-center md:text-left flex flex-col md:flex-row print:flex-row justify-between print:justify-between items-start print:items-start gap-6 print:text-left">
+          <div className="print:text-left print:flex print:flex-col print:items-start">
             <h1 className="font-display font-black text-3xl md:text-4xl text-white print:text-black tracking-tight leading-none">
               Saumyadeep Chakraborty
             </h1>
             <p className="text-cyan-accent print:text-black font-semibold text-sm md:text-base mt-2 tracking-wide uppercase">
               Full Stack Systems Architect &amp; Software Engineer
             </p>
-            <p className="text-text-secondary print:text-black/60 text-xs md:text-sm mt-3 flex items-center justify-center md:justify-start gap-2">
+            <p className="text-text-secondary print:text-black/60 text-xs md:text-sm mt-3 flex items-center justify-center md:justify-start print:justify-start gap-2">
               <MapPin className="w-4 h-4 text-amber-accent print:text-black" /> Cooch Behar, West Bengal, India
             </p>
           </div>
 
-          <div className="flex flex-col gap-2.5 text-xs md:text-sm text-text-secondary print:text-black/80 font-sans font-medium w-full md:w-auto items-center md:items-end">
-            <a href="mailto:saumyadeephere@zohomail.in" className="hover:text-cyan-accent print:text-black transition-colors flex items-center gap-2">
+          <div className="flex flex-col gap-2.5 text-xs md:text-sm text-text-secondary print:text-black/80 font-sans font-medium w-full md:w-auto print:w-auto items-center md:items-end print:items-end print:text-right">
+            <a href="mailto:saumyadeephere@zohomail.in" className="hover:text-cyan-accent print:text-black transition-colors flex items-center print:justify-end gap-2">
               <Mail className="w-4 h-4" /> saumyadeephere@zohomail.in
             </a>
-            <a href="https://techysaumyadeep.vercel.app" className="hover:text-cyan-accent print:text-black transition-colors flex items-center gap-2">
+            <a href="https://techysaumyadeep.vercel.app" className="hover:text-cyan-accent print:text-black transition-colors flex items-center print:justify-end gap-2">
               <Globe className="w-4 h-4" /> techysaumyadeep.vercel.app
             </a>
             <div className="flex items-center gap-3.5 mt-2 flex-wrap justify-center md:justify-end no-print">
@@ -83,7 +83,7 @@ export default function ResumePage() {
               </a>
             </div>
             {/* Print-only simplified text fallback for ATS scanners */}
-            <span className="hidden print:block text-[10px] mt-1 text-black/60">
+            <span className="hidden print:block text-[10px] mt-1 text-black/60 print:text-right">
               github.com/SoumaCh03 | linkedin.com/in/saumyadeep-c | facebook.com/SaumyanaCh03
             </span>
           </div>
@@ -107,7 +107,7 @@ export default function ResumePage() {
             <h2 className="font-display font-bold text-lg md:text-xl text-white print:text-black tracking-wide border-b border-white/5 print:border-black/10 pb-2 mb-4 uppercase flex items-center gap-2">
               <Code2 className="w-4 h-4 text-cyan-accent print:text-black" /> Core Skills
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 font-sans font-medium text-xs md:text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 print:grid-cols-3 gap-4 font-sans font-medium text-xs md:text-sm">
               <div>
                 <span className="font-semibold text-white print:text-black">Languages:</span>
                 <p className="text-text-secondary print:text-black/70 mt-1">Python, TypeScript, JavaScript, C++</p>
