@@ -44,7 +44,6 @@ const AlbumSchema = new Schema<IAlbum>(
 
 // Index for fast ordered queries
 AlbumSchema.index({ order: 1 });
-AlbumSchema.index({ slug: 1 });
 
 const Album: Model<IAlbum> =
   mongoose.models.Album || mongoose.model<IAlbum>("Album", AlbumSchema);
