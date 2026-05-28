@@ -42,7 +42,12 @@ export async function POST(req: Request) {
     }
 
     await connectDB();
-    const admin = await Admin.findOne({ username });
+    const admin = await Admin.findOne({
+      $or: [
+        { username: username },
+        { primaryEmail: username.toLowerCase().trim() }
+      ]
+    });
 
     if (!admin) {
       return NextResponse.json(
@@ -103,7 +108,11 @@ export async function GET() {
     });
 
     if (admin) {
-      return NextResponse.json({ authenticated: true, recoveryEmail: admin.recoveryEmail });
+      return NextResponse.json({ 
+        authenticated: true, 
+        primaryEmail: admin.primaryEmail || "",
+        recoveryEmail: admin.recoveryEmail 
+      });
     }
     return NextResponse.json({ authenticated: false }, { status: 401 });
   } catch {

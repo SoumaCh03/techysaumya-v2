@@ -160,6 +160,10 @@ export default function AdminPage() {
   const [changePasswordError, setChangePasswordError] = useState("");
   const [changePasswordSuccess, setChangePasswordSuccess] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
+  const [adminPrimaryEmail, setAdminPrimaryEmail] = useState("");
+  const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [updateRecoveryError, setUpdateRecoveryError] = useState("");
+  const [updateRecoverySuccess, setUpdateRecoverySuccess] = useState("");
 
   // OTP Validation states
   const [otpCode, setOtpCode] = useState("");
@@ -295,6 +299,7 @@ export default function AdminPage() {
           if (json.authenticated) {
             setAuthenticated(true);
             setAdminEmail(json.recoveryEmail || "");
+            setAdminPrimaryEmail(json.primaryEmail || "");
             fetchAlbums();
             fetchBlogs();
           }
@@ -350,6 +355,7 @@ export default function AdminPage() {
           if (sessionRes.ok) {
             const sessionData = await sessionRes.json();
             setAdminEmail(sessionData.recoveryEmail || "");
+            setAdminPrimaryEmail(sessionData.primaryEmail || "");
           }
         } catch {}
         fetchAlbums();
@@ -526,6 +532,40 @@ export default function AdminPage() {
       }
     } catch (e) {
       setChangePasswordError("Failed to connect to change-password server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateRecovery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setUpdateRecoveryError("");
+    setUpdateRecoverySuccess("");
+
+    try {
+      const res = await fetch("/api/admin/update-recovery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: recoveryPassword,
+          primaryEmail: adminPrimaryEmail,
+          recoveryEmail: adminEmail,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok) {
+        setUpdateRecoverySuccess("Recovery information updated successfully!");
+        showAlert("Success", "Recovery settings updated successfully.");
+        setRecoveryPassword("");
+        setAdminPrimaryEmail(json.primaryEmail);
+        setAdminEmail(json.recoveryEmail);
+      } else {
+        setUpdateRecoveryError(json.error || "Failed to update recovery settings.");
+      }
+    } catch (e) {
+      setUpdateRecoveryError("Failed to connect to update-recovery server.");
     } finally {
       setLoading(false);
     }
@@ -2440,22 +2480,71 @@ export default function AdminPage() {
             </form>
           </div>
 
-          <div className="glass-panel border-white/5 rounded-3xl p-6 md:p-8 flex flex-col gap-4">
-            <h2 className="font-display font-bold text-lg text-white flex items-center gap-2.5">
-              <Mail className="w-5 h-5 text-cyan-accent" /> Recovery Information
+          <div className="glass-panel border-white/5 rounded-3xl p-6 md:p-8 flex flex-col gap-6">
+            <h2 className="font-display font-bold text-xl md:text-2xl text-white flex items-center gap-2.5">
+              <Mail className="w-6 h-6 text-cyan-accent" /> Recovery Information
             </h2>
-            <p className="text-text-secondary text-sm font-sans font-medium">
-              Your registered recovery email is used to verify OTPs when restoring account access.
+            <p className="text-text-secondary text-sm font-sans font-medium leading-relaxed">
+              Verify and manage your primary login email and recovery channels. Recovery email is used to dispatch secure verification OTP codes when restoring access.
             </p>
-            <div className="flex items-center justify-between bg-white/2 border border-white/5 px-4.5 py-3 rounded-xl">
+            
+            <form onSubmit={handleUpdateRecovery} className="flex flex-col gap-5">
               <div>
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-text-secondary mb-0.5">Recovery Email</span>
-                <span className="text-white text-sm font-mono">{adminEmail || "portfolio.saumyadeep@gmail.com"}</span>
+                <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">Primary Login Email</label>
+                <input
+                  type="email"
+                  required
+                  value={adminPrimaryEmail}
+                  onChange={(e) => setAdminPrimaryEmail(e.target.value)}
+                  placeholder="admin@example.com"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                />
               </div>
-              <span className="px-2.5 py-1 bg-cyan-accent/10 border border-cyan-accent/20 text-cyan-accent rounded-lg text-[10px] font-sans font-bold uppercase tracking-wide">
-                Verified Active
-              </span>
-            </div>
+
+              <div>
+                <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">Verified Recovery Email</label>
+                <input
+                  type="email"
+                  required
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  placeholder="recovery@example.com"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                />
+              </div>
+
+              <div className="border-t border-white/5 pt-4">
+                <label className="block text-xs font-semibold tracking-wider uppercase text-cyan-accent/70 mb-2">Verify Password to Save Changes</label>
+                <input
+                  type="password"
+                  required
+                  value={recoveryPassword}
+                  onChange={(e) => setRecoveryPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-xl border border-cyan-accent/10 focus:border-cyan-accent/40 bg-white/2 text-white outline-none font-sans transition-all text-sm"
+                />
+              </div>
+
+              {updateRecoveryError && (
+                <p className="text-red-500 font-sans text-xs text-center font-medium bg-red-500/10 py-2.5 rounded-lg border border-red-500/20 flex items-center justify-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5" /> {updateRecoveryError}
+                </p>
+              )}
+
+              {updateRecoverySuccess && (
+                <p className="text-cyan-accent font-sans text-xs text-center font-medium bg-cyan-accent/10 py-2.5 rounded-lg border border-cyan-accent/20 flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> {updateRecoverySuccess}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-accent to-cyan-500 text-bg-base font-bold tracking-wider uppercase hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Recovery Info"}
+              </button>
+            </form>
           </div>
         </div>
       )}
