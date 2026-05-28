@@ -90,9 +90,20 @@ export async function POST(req: Request) {
 // Session validation route
 export async function GET() {
   try {
-    const authenticated = await isAuthorized();
-    if (authenticated) {
-      return NextResponse.json({ authenticated: true });
+    const cookieStore = await cookies();
+    const token = cookieStore.get("techysaumya_session")?.value;
+    if (!token) {
+      return NextResponse.json({ authenticated: false }, { status: 401 });
+    }
+
+    await connectDB();
+    const admin = await Admin.findOne({
+      sessionToken: token,
+      sessionExpiry: { $gt: new Date() },
+    });
+
+    if (admin) {
+      return NextResponse.json({ authenticated: true, recoveryEmail: admin.recoveryEmail });
     }
     return NextResponse.json({ authenticated: false }, { status: 401 });
   } catch {

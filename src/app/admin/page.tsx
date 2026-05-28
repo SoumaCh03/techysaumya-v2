@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   LogIn, Plus, Trash2, ArrowLeft, ArrowRight, ArrowUp, ArrowDown,
   Upload, Image as ImageIcon, Settings, LogOut, Loader2, Sparkles, LayoutGrid,
-  Edit2, KeyRound, Mail, User, ShieldAlert, CheckCircle2, AlertCircle, X,
+  Edit2, KeyRound, Mail, User, ShieldAlert, CheckCircle2, AlertCircle, X, Key, ShieldCheck,
   FileText, Bold, Heading, Link2, List, Quote, Eye, EyeOff, Globe, Sparkle
 } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -132,11 +132,11 @@ function markdownToHtml(markdown: string): string {
 
 export default function AdminPage() {
   // 1. View & Session State
-  const [currentView, setCurrentView] = useState<"login" | "forgot-password" | "forgot-username" | "reset-password">("login");
+  const [currentView, setCurrentView] = useState<"login" | "forgot-password" | "forgot-username" | "reset-password" | "otp-verify">("login");
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [checkingSession, setCheckingSession] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"albums" | "blogs">("albums");
+  const [activeTab, setActiveTab] = useState<"albums" | "blogs" | "security">("albums");
   
   // Login fields
   const [username, setUsername] = useState("");
@@ -152,6 +152,19 @@ export default function AdminPage() {
   const [tokenChecking, setTokenChecking] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Dashboard Change Password and Security states
+  const [adminCurrentPassword, setAdminCurrentPassword] = useState("");
+  const [adminNewPassword, setAdminNewPassword] = useState("");
+  const [adminConfirmPassword, setAdminConfirmPassword] = useState("");
+  const [changePasswordError, setChangePasswordError] = useState("");
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+
+  // OTP Validation states
+  const [otpCode, setOtpCode] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [recoveredUsername, setRecoveredUsername] = useState("");
 
   // 2. Custom Modals & Dialogs State
   const [modal, setModal] = useState<ModalConfig>({
@@ -281,6 +294,7 @@ export default function AdminPage() {
           const json = await res.json();
           if (json.authenticated) {
             setAuthenticated(true);
+            setAdminEmail(json.recoveryEmail || "");
             fetchAlbums();
             fetchBlogs();
           }
@@ -330,6 +344,14 @@ export default function AdminPage() {
       });
       if (res.ok) {
         setAuthenticated(true);
+        // Get recovery email
+        try {
+          const sessionRes = await fetch("/api/admin/login");
+          if (sessionRes.ok) {
+            const sessionData = await sessionRes.json();
+            setAdminEmail(sessionData.recoveryEmail || "");
+          }
+        } catch {}
         fetchAlbums();
         fetchBlogs();
         confetti({ particleCount: 80, spread: 60 });
@@ -375,8 +397,14 @@ export default function AdminPage() {
       });
       const json = await res.json();
       if (res.ok) {
-        setRecoverySuccessMsg(json.message || "Email dispatched successfully.");
-        showAlert("Check Your Inbox", json.message || "A secure recovery link has been sent to your recovery email.");
+        setRecoverySuccessMsg(json.message || "OTP Code sent.");
+        showAlert("Check Your Inbox", "A 6-digit recovery code has been generated. If the email is registered, it has been dispatched.");
+        setOtpVerified(false);
+        setOtpCode("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setRecoveredUsername("");
+        setCurrentView("otp-verify");
       } else {
         setErrorMsg(json.error || "Failed to trigger recovery process.");
       }
@@ -387,26 +415,117 @@ export default function AdminPage() {
     }
   };
 
-  const handleForgotUsername = async (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
     setRecoverySuccessMsg("");
     try {
-      const res = await fetch("/api/admin/forgot-username", {
+      const res = await fetch("/api/admin/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: recoveryEmail }),
+        body: JSON.stringify({
+          email: recoveryEmail,
+          otp: otpCode,
+          type: "verify",
+        }),
       });
       const json = await res.json();
       if (res.ok) {
-        setRecoverySuccessMsg(json.message || "Username retrieved successfully.");
-        showAlert("Check Your Inbox", json.message || "Your username has been emailed to you.");
+        setOtpVerified(true);
+        setRecoveredUsername(json.username);
+        setRecoverySuccessMsg("Identity verified successfully!");
       } else {
-        setErrorMsg(json.error || "Failed to trigger username recovery.");
+        setErrorMsg(json.error || "Invalid or expired OTP code.");
       }
     } catch (e) {
-      setErrorMsg("Failed to connect to server.");
+      setErrorMsg("Connection failure during verification.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPasswordOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setErrorMsg("Passwords do not match.");
+      return;
+    }
+    setLoading(true);
+    setErrorMsg("");
+    setRecoverySuccessMsg("");
+    try {
+      const res = await fetch("/api/admin/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: recoveryEmail,
+          otp: otpCode,
+          newPassword,
+          confirmPassword,
+          type: "reset",
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showAlert("Success", "Credentials successfully reset! Please sign in with your new password.");
+        setCurrentView("login");
+        setOtpVerified(false);
+        setOtpCode("");
+        setRecoveryEmail("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setRecoveredUsername("");
+      } else {
+        setErrorMsg(json.error || "Password reset failed.");
+      }
+    } catch (e) {
+      setErrorMsg("Failed to connect to password reset server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setChangePasswordError("");
+    setChangePasswordSuccess("");
+
+    if (adminNewPassword !== adminConfirmPassword) {
+      setChangePasswordError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/admin/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: adminCurrentPassword,
+          newPassword: adminNewPassword,
+          confirmPassword: adminConfirmPassword,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok) {
+        setChangePasswordSuccess("Password updated successfully! Redirecting to login...");
+        showAlert("Success", "Password updated successfully. You will be logged out to sign in again with your new credentials.");
+        setTimeout(() => {
+          setAuthenticated(false);
+          setAdminCurrentPassword("");
+          setAdminNewPassword("");
+          setAdminConfirmPassword("");
+          setChangePasswordSuccess("");
+          setCurrentView("login");
+        }, 3000);
+      } else {
+        setChangePasswordError(json.error || "Failed to update password.");
+      }
+    } catch (e) {
+      setChangePasswordError("Failed to connect to change-password server.");
     } finally {
       setLoading(false);
     }
@@ -1123,16 +1242,16 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* VIEW: FORGOT PASSWORD */}
+        {/* VIEW: FORGOT CREDENTIALS */}
         {currentView === "forgot-password" && (
           <div className="w-full max-w-md glass-panel p-8 rounded-3xl relative border-white/5 shadow-black/90 animate-in fade-in zoom-in-95 duration-300">
             <div className="flex flex-col items-center mb-8">
               <div className="w-14 h-14 rounded-2xl bg-cyan-accent/10 border border-cyan-accent/25 flex items-center justify-center text-cyan-accent mb-4">
                 <KeyRound className="w-6 h-6" />
               </div>
-              <h1 className="font-display font-black text-2xl tracking-tight text-white">Reset Password</h1>
+              <h1 className="font-display font-black text-2xl tracking-tight text-white">Forgot Credentials</h1>
               <p className="text-text-secondary text-sm mt-1 font-sans font-medium text-center">
-                We will send you a secure token link to restore password access.
+                Enter your registered recovery email to receive a secure 6-digit verification code.
               </p>
             </div>
 
@@ -1169,7 +1288,7 @@ export default function AdminPage() {
                 disabled={loading}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-accent to-cyan-500 text-bg-base font-bold tracking-wider uppercase hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Reset Link"}
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Recovery Code"}
               </button>
             </form>
 
@@ -1182,58 +1301,110 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* VIEW: FORGOT USERNAME */}
-        {currentView === "forgot-username" && (
+        {/* VIEW: OTP VERIFICATION & CREDENTIALS RESET */}
+        {currentView === "otp-verify" && (
           <div className="w-full max-w-md glass-panel p-8 rounded-3xl relative border-white/5 shadow-black/90 animate-in fade-in zoom-in-95 duration-300">
             <div className="flex flex-col items-center mb-8">
               <div className="w-14 h-14 rounded-2xl bg-cyan-accent/10 border border-cyan-accent/25 flex items-center justify-center text-cyan-accent mb-4">
-                <User className="w-6 h-6" />
+                <ShieldCheck className="w-6 h-6" />
               </div>
-              <h1 className="font-display font-black text-2xl tracking-tight text-white">Find Username</h1>
+              <h1 className="font-display font-black text-2xl tracking-tight text-white">Verify Recovery Code</h1>
               <p className="text-text-secondary text-sm mt-1 font-sans font-medium text-center">
-                We will look up and mail your registered admin username.
+                Enter the 6-digit OTP code sent to your registered recovery email.
               </p>
             </div>
 
-            <form onSubmit={handleForgotUsername} className="flex flex-col gap-5">
-              <div>
-                <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">Recovery Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-text-secondary" />
+            {!otpVerified ? (
+              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5">
+                <div>
+                  <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">6-Digit Code</label>
                   <input
-                    type="email"
+                    type="text"
                     required
-                    value={recoveryEmail}
-                    onChange={(e) => setRecoveryEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                    placeholder="123456"
+                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-mono tracking-[8px] text-center text-lg transition-all"
                   />
                 </div>
-              </div>
 
-              {errorMsg && (
-                <p className="text-red-500 font-sans text-xs text-center font-medium bg-red-500/10 py-2.5 rounded-lg border border-red-500/20 flex items-center justify-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5" /> {errorMsg}
-                </p>
-              )}
+                {errorMsg && (
+                  <p className="text-red-500 font-sans text-xs text-center font-medium bg-red-500/10 py-2.5 rounded-lg border border-red-500/20 flex items-center justify-center gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errorMsg}
+                  </p>
+                )}
 
-              {recoverySuccessMsg && (
-                <p className="text-cyan-accent font-sans text-xs text-center font-medium bg-cyan-accent/10 py-2.5 rounded-lg border border-cyan-accent/20 flex items-center justify-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> {recoverySuccessMsg}
-                </p>
-              )}
+                {recoverySuccessMsg && (
+                  <p className="text-cyan-accent font-sans text-xs text-center font-medium bg-cyan-accent/10 py-2.5 rounded-lg border border-cyan-accent/20 flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> {recoverySuccessMsg}
+                  </p>
+                )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-accent to-cyan-500 text-bg-base font-bold tracking-wider uppercase hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Recover Username"}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={loading || otpCode.length !== 6}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-accent to-cyan-500 text-bg-base font-bold tracking-wider uppercase hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify Code"}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleResetPasswordOtp} className="flex flex-col gap-5 animate-in fade-in duration-300">
+                {/* Username Display Panel */}
+                <div className="bg-white/2 border border-white/5 rounded-2xl p-4 flex flex-col gap-1 text-center">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-text-secondary">Recovered Username</span>
+                  <span className="text-white font-mono font-bold text-lg">{recoveredUsername}</span>
+                </div>
+
+                <div className="border-t border-white/5 pt-4">
+                  <p className="text-text-secondary text-xs mb-4 text-center">To change your password as well, specify a new one below.</p>
+                  
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">New Password</label>
+                      <input
+                        type="password"
+                        required
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">Confirm New Password</label>
+                      <input
+                        type="password"
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {errorMsg && (
+                  <p className="text-red-500 font-sans text-xs text-center font-medium bg-red-500/10 py-2.5 rounded-lg border border-red-500/20 flex items-center justify-center gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errorMsg}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-accent to-cyan-500 text-bg-base font-bold tracking-wider uppercase hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Credentials"}
+                </button>
+              </form>
+            )}
 
             <button
-              onClick={() => { setCurrentView("login"); setErrorMsg(""); setRecoverySuccessMsg(""); }}
+              onClick={() => { setCurrentView("login"); setErrorMsg(""); setRecoverySuccessMsg(""); setOtpVerified(false); }}
               className="w-full text-center mt-6 text-text-secondary hover:text-white text-xs font-sans font-semibold uppercase tracking-wider flex items-center justify-center gap-1.5"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Sign In
@@ -1384,6 +1555,16 @@ export default function AdminPage() {
           }`}
         >
           <FileText className="w-4 h-4" /> Blog Posts ({blogs.length})
+        </button>
+        <button
+          onClick={() => { setActiveTab("security"); setSelectedAlbum(null); resetBlogForm(); setShowAddBlog(false); }}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-sans text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+            activeTab === "security"
+              ? "bg-cyan-accent text-bg-base font-bold shadow-[0_0_12px_rgba(0,240,255,0.25)]"
+              : "border border-white/5 text-text-secondary hover:text-white"
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4" /> Security Settings
         </button>
       </div>
 
@@ -2187,6 +2368,95 @@ export default function AdminPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === "security" && (
+        <div className="w-full max-w-2xl mx-auto flex flex-col gap-8 animate-in fade-in duration-300">
+          <div className="glass-panel border-white/5 rounded-3xl p-6 md:p-8 flex flex-col gap-6">
+            <h2 className="font-display font-bold text-xl md:text-2xl text-white flex items-center gap-2.5">
+              <Key className="w-6 h-6 text-cyan-accent" /> Change Administrator Password
+            </h2>
+            <p className="text-text-secondary text-sm font-sans font-medium leading-relaxed">
+              Define a strong, secure new password. Ensure it meets the system security policy. You will be logged out and required to sign in with your new password.
+            </p>
+            
+            <form onSubmit={handleChangePassword} className="flex flex-col gap-5">
+              <div>
+                <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">Current Password</label>
+                <input
+                  type="password"
+                  required
+                  value={adminCurrentPassword}
+                  onChange={(e) => setAdminCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={adminNewPassword}
+                  onChange={(e) => setAdminNewPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold tracking-wider uppercase text-text-secondary mb-2">Confirm New Password</label>
+                <input
+                  type="password"
+                  required
+                  value={adminConfirmPassword}
+                  onChange={(e) => setAdminConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/2 text-white outline-none focus:border-cyan-accent/40 font-sans transition-all text-sm"
+                />
+              </div>
+
+              {changePasswordError && (
+                <p className="text-red-500 font-sans text-xs text-center font-medium bg-red-500/10 py-2.5 rounded-lg border border-red-500/20 flex items-center justify-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5" /> {changePasswordError}
+                </p>
+              )}
+
+              {changePasswordSuccess && (
+                <p className="text-cyan-accent font-sans text-xs text-center font-medium bg-cyan-accent/10 py-2.5 rounded-lg border border-cyan-accent/20 flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> {changePasswordSuccess}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-accent to-cyan-500 text-bg-base font-bold tracking-wider uppercase hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Password"}
+              </button>
+            </form>
+          </div>
+
+          <div className="glass-panel border-white/5 rounded-3xl p-6 md:p-8 flex flex-col gap-4">
+            <h2 className="font-display font-bold text-lg text-white flex items-center gap-2.5">
+              <Mail className="w-5 h-5 text-cyan-accent" /> Recovery Information
+            </h2>
+            <p className="text-text-secondary text-sm font-sans font-medium">
+              Your registered recovery email is used to verify OTPs when restoring account access.
+            </p>
+            <div className="flex items-center justify-between bg-white/2 border border-white/5 px-4.5 py-3 rounded-xl">
+              <div>
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-text-secondary mb-0.5">Recovery Email</span>
+                <span className="text-white text-sm font-mono">{adminEmail || "portfolio.saumyadeep@gmail.com"}</span>
+              </div>
+              <span className="px-2.5 py-1 bg-cyan-accent/10 border border-cyan-accent/20 text-cyan-accent rounded-lg text-[10px] font-sans font-bold uppercase tracking-wide">
+                Verified Active
+              </span>
+            </div>
+          </div>
         </div>
       )}
     </div>
