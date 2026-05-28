@@ -38,6 +38,35 @@ export default function PhotographyPage() {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number>(-1);
 
+  // Lightbox Touch/Swipe Gestures
+  const touchStartX = React.useRef<number>(0);
+  const touchStartY = React.useRef<number>(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartX.current || !touchStartY.current) return;
+
+    const diffX = e.changedTouches[0].clientX - touchStartX.current;
+    const diffY = e.changedTouches[0].clientY - touchStartY.current;
+
+    const threshold = 50; // threshold in pixels
+
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+      if (diffX > 0) {
+        navigateLightbox("prev");
+      } else {
+        navigateLightbox("next");
+      }
+    }
+
+    touchStartX.current = 0;
+    touchStartY.current = 0;
+  };
+
   const [animatingLikes, setAnimatingLikes] = useState<Record<string, boolean>>({});
 
   const triggerLikeAnimation = (photoId: string) => {
@@ -362,6 +391,8 @@ export default function PhotographyPage() {
         <div 
           className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-200"
           onContextMenu={(e) => e.preventDefault()}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           
           {/* Close trigger */}
