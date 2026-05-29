@@ -14,6 +14,14 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
       {
+        userAgent: ["Googlebot", "Bingbot"],
+        allow: "/",
+        disallow: [
+          "/admin",
+          "/api",
+        ],
+      },
+      {
         userAgent: ["YandexBot", "Baiduspider"],
         allow: "/",
         disallow: [
