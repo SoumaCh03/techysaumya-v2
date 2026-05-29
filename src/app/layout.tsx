@@ -57,6 +57,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Saumyadeep Chakraborty" }],
   creator: "Saumyadeep Chakraborty",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
   alternates: {
     canonical: "/",
   },
