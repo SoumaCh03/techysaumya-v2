@@ -205,6 +205,8 @@ const jsonLdGraph = {
       "sameAs": [
         "https://github.com/SoumaCh03",
         "https://www.linkedin.com/in/saumyadeep-c-34342a177/",
+        "https://x.com/ImSaumyaCh",
+        "https://www.facebook.com/SaumyanaCh03/",
         "https://snappysaumya.vercel.app",
       ],
       "address": {
