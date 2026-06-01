@@ -122,7 +122,7 @@ export const metadata: Metadata = {
     siteName: "TechySaumya",
     images: [
       {
-        url: "/preview-image.png",
+        url: (process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app") + "/preview-image.png",
         width: 1200,
         height: 630,
         alt: "Saumyadeep Chakraborty portrait also known as TechySaumya",
@@ -134,7 +134,7 @@ export const metadata: Metadata = {
     title: "Saumyadeep Chakraborty | TechySaumya",
     description:
       "Backend systems, AI architectures, photography, and motorcycle touring logs.",
-    images: ["/preview-image.png"],
+    images: [(process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app") + "/preview-image.png"],
   },
 };
 
