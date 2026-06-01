@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/mongoose";
 import BlogPost from "@/models/BlogPost";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeep.co.in";
 
   // Core portfolio routes
   const routes = [

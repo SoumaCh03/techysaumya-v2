@@ -82,25 +82,25 @@ export default async function BlogPostLayout({
         "@type": "BlogPosting",
         "headline": post.title,
         "description": post.summary,
-        "image": post.coverImage || "https://saumyadeepch.vercel.app/preview-image.png",
+        "image": post.coverImage || "https://saumyadeep.co.in/preview-image.png",
         "datePublished": post.createdAt ? new Date(post.createdAt).toISOString() : new Date().toISOString(),
         "dateModified": post.updatedAt ? new Date(post.updatedAt).toISOString() : new Date().toISOString(),
         "author": {
           "@type": "Person",
           "name": "Saumyadeep Chakraborty",
-          "url": "https://saumyadeepch.vercel.app/",
+          "url": "https://saumyadeep.co.in/",
         },
         "publisher": {
           "@type": "Organization",
           "name": "TechySaumya",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://saumyadeepch.vercel.app/favicon.svg",
+            "url": "https://saumyadeep.co.in/favicon.svg",
           },
         },
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "@id": `https://saumyadeepch.vercel.app/blog/${slug}`,
+          "@id": `https://saumyadeep.co.in/blog/${slug}`,
         },
       };
     }

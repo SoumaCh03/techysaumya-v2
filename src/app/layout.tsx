@@ -83,7 +83,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Saumyadeep Chakraborty" }],
   creator: "Saumyadeep Chakraborty",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeep.co.in"),
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -115,14 +115,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeep.co.in",
     title: "Saumyadeep Chakraborty | TechySaumya | Full Stack Developer",
     description:
       "Official portfolio of Saumyadeep Chakraborty (TechySaumya) showcasing high-performance backend systems, AI agents, photography, and motorcycle touring.",
     siteName: "TechySaumya",
     images: [
       {
-        url: (process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app") + "/preview-image.png",
+        url: (process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeep.co.in") + "/preview-image.png",
         width: 1200,
         height: 630,
         alt: "Saumyadeep Chakraborty portrait also known as TechySaumya",
@@ -134,7 +134,7 @@ export const metadata: Metadata = {
     title: "Saumyadeep Chakraborty | TechySaumya",
     description:
       "Backend systems, AI architectures, photography, and motorcycle touring logs.",
-    images: [(process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeepch.vercel.app") + "/preview-image.png"],
+    images: [(process.env.NEXT_PUBLIC_SITE_URL || "https://saumyadeep.co.in") + "/preview-image.png"],
   },
 };
 
@@ -144,7 +144,7 @@ const jsonLdGraph = {
   "@graph": [
     {
       "@type": "Person",
-      "@id": "https://saumyadeepch.vercel.app/#person",
+      "@id": "https://saumyadeep.co.in/#person",
       "name": "Saumyadeep Chakraborty",
       "alternateName": [
         "Saumyadeep",
@@ -182,8 +182,8 @@ const jsonLdGraph = {
         "Bapuji Saumya",
         "Bapu Saumyadeep",
       ],
-      "url": "https://saumyadeepch.vercel.app/",
-      "image": "https://saumyadeepch.vercel.app/saumyadeep-chakraborty-techysaumya-portrait.jpg",
+      "url": "https://saumyadeep.co.in/",
+      "image": "https://saumyadeep.co.in/saumyadeep-chakraborty-techysaumya-portrait.jpg",
       "jobTitle": ["Full Stack Developer", "Backend Engineer", "Photographer"],
       "description":
         "Saumyadeep Chakraborty is an Indian full stack developer, backend engineer, photographer, and motorcycle touring enthusiast known online as TechySaumya.",
@@ -218,18 +218,18 @@ const jsonLdGraph = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://saumyadeepch.vercel.app/#website",
-      "url": "https://saumyadeepch.vercel.app/",
+      "@id": "https://saumyadeep.co.in/#website",
+      "url": "https://saumyadeep.co.in/",
       "name": "TechySaumya",
       "publisher": {
-        "@id": "https://saumyadeepch.vercel.app/#person",
+        "@id": "https://saumyadeep.co.in/#person",
       },
       "potentialAction": [
         {
           "@type": "SearchAction",
           "target": {
             "@type": "EntryPoint",
-            "urlTemplate": "https://saumyadeepch.vercel.app/blog?search={search_term_string}"
+            "urlTemplate": "https://saumyadeep.co.in/blog?search={search_term_string}"
           },
           "query-input": "required name=search_term_string"
         }
@@ -237,45 +237,45 @@ const jsonLdGraph = {
     },
     {
       "@type": "ProfilePage",
-      "@id": "https://saumyadeepch.vercel.app/#profilepage",
+      "@id": "https://saumyadeep.co.in/#profilepage",
       "mainEntity": {
-        "@id": "https://saumyadeepch.vercel.app/#person",
+        "@id": "https://saumyadeep.co.in/#person",
       },
       "headline": "Saumyadeep Chakraborty | TechySaumya",
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "https://saumyadeepch.vercel.app/#breadcrumb",
+      "@id": "https://saumyadeep.co.in/#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": "https://saumyadeepch.vercel.app/"
+          "item": "https://saumyadeep.co.in/"
         },
         {
           "@type": "ListItem",
           "position": 2,
           "name": "Photography",
-          "item": "https://saumyadeepch.vercel.app/photography"
+          "item": "https://saumyadeep.co.in/photography"
         },
         {
           "@type": "ListItem",
           "position": 3,
           "name": "Journey",
-          "item": "https://saumyadeepch.vercel.app/journey"
+          "item": "https://saumyadeep.co.in/journey"
         },
         {
           "@type": "ListItem",
           "position": 4,
           "name": "Resume",
-          "item": "https://saumyadeepch.vercel.app/resume"
+          "item": "https://saumyadeep.co.in/resume"
         },
         {
           "@type": "ListItem",
           "position": 5,
           "name": "Blog",
-          "item": "https://saumyadeepch.vercel.app/blog"
+          "item": "https://saumyadeep.co.in/blog"
         }
       ]
     }

@@ -1,5 +1,5 @@
 export async function pingIndexNow(urls: string[]) {
-  const host = "saumyadeepch.vercel.app";
+  const host = "saumyadeep.co.in";
   const key = "89fca6d3c7b2432a9e52e2bf6cd4e9c7";
   const keyLocation = `https://${host}/${key}.txt`;
 
