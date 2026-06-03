@@ -9,16 +9,18 @@ export default function SocialFloat() {
   const [greeting, setGreeting] = React.useState("Good Day");
 
   React.useEffect(() => {
-    setMounted(true);
-    // Dynamically calculate greeting based on client browser local time
-    const hr = new Date().getHours();
-    if (hr >= 5 && hr < 12) {
-      setGreeting("Good Morning");
-    } else if (hr >= 12 && hr < 17) {
-      setGreeting("Good Afternoon");
-    } else {
-      setGreeting("Good Evening");
-    }
+    setTimeout(() => {
+      setMounted(true);
+      // Dynamically calculate greeting based on client browser local time
+      const hr = new Date().getHours();
+      if (hr >= 5 && hr < 12) {
+        setGreeting("Good Morning");
+      } else if (hr >= 12 && hr < 17) {
+        setGreeting("Good Afternoon");
+      } else {
+        setGreeting("Good Evening");
+      }
+    }, 0);
   }, []);
 
   const currentGreeting = mounted ? greeting : "Good Day";

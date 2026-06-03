@@ -5,9 +5,10 @@ import {
   LogIn, Plus, Trash2, ArrowLeft, ArrowRight, ArrowUp, ArrowDown,
   Upload, Image as ImageIcon, Settings, LogOut, Loader2, Sparkles, LayoutGrid,
   Edit2, KeyRound, Mail, User, ShieldAlert, CheckCircle2, AlertCircle, X, Key, ShieldCheck,
-  FileText, Bold, Heading, Link2, List, Quote, Eye, EyeOff, Globe, Sparkle
+  FileText, Bold, Heading, Link2, List, Quote, Eye, EyeOff, Globe, Sparkle, Activity
 } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useRouter } from "next/navigation";
 
 interface Photo {
   id: string;
@@ -131,6 +132,7 @@ function markdownToHtml(markdown: string): string {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   // 1. View & Session State
   const [currentView, setCurrentView] = useState<"login" | "forgot-password" | "forgot-username" | "reset-password" | "otp-verify">("login");
   const [authenticated, setAuthenticated] = useState<boolean>(false);
@@ -1605,6 +1607,12 @@ export default function AdminPage() {
           }`}
         >
           <ShieldCheck className="w-4 h-4" /> Security Settings
+        </button>
+        <button
+          onClick={() => { router.push("/admin/analytics"); }}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-sans text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap border border-white/5 text-text-secondary hover:text-white hover:border-cyan-accent/30 hover:bg-cyan-accent/5"
+        >
+          <Activity className="w-4 h-4 text-cyan-accent" /> Analytics Dashboard
         </button>
       </div>
 

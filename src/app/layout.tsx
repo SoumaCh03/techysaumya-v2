@@ -5,6 +5,7 @@ import Providers from "./providers";
 import StarField from "@/components/shared/StarField";
 import SocialFloat from "@/components/social/SocialFloat";
 import Script from "next/script";
+import AnalyticsTracker from "@/components/analytics/AnalyticsTracker";
 
 
 // 1. Google Font Preloads
@@ -396,6 +397,7 @@ export default function RootLayout({
           
           {/* Floating Social Buttons */}
           <SocialFloat />
+          <AnalyticsTracker />
         </Providers>
       </body>
 
