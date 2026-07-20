@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://techysaumyadeep.vercel.app/sitemap.xml
+Sitemap: https://saumyadeep.co.in/sitemap.xml

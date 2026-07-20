@@ -62,8 +62,8 @@ export default function ResumePage() {
             <a href="mailto:saumyadeephere@zohomail.in" className="hover:text-cyan-accent print:text-black transition-colors flex items-center print:justify-end gap-2">
               <Mail className="w-4 h-4" /> saumyadeephere@zohomail.in
             </a>
-            <a href="https://techysaumyadeep.vercel.app" className="hover:text-cyan-accent print:text-black transition-colors flex items-center print:justify-end gap-2">
-              <Globe className="w-4 h-4" /> techysaumyadeep.vercel.app
+            <a href="https://saumyadeep.co.in" className="hover:text-cyan-accent print:text-black transition-colors flex items-center print:justify-end gap-2">
+              <Globe className="w-4 h-4" /> saumyadeep.co.in
             </a>
             <div className="flex items-center gap-3.5 mt-2 flex-wrap justify-center md:justify-end no-print">
               <a href="https://github.com/SoumaCh03" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-accent transition-colors" title="GitHub">

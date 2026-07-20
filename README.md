@@ -59,7 +59,7 @@ Create a `.env.local` file in the root of your project directory and configure t
 | **CLOUDINARY_CLOUD_NAME**| Cloudinary Cloud Name identifier | `my-cloudinary-cloud` |
 | **CLOUDINARY_API_KEY** | Cloudinary API Key | `1234567890` |
 | **CLOUDINARY_API_SECRET**| Cloudinary API Secret | `secret_abc123` |
-| **NEXT_PUBLIC_SITE_URL** | Canonical base URL (for dynamic sitemaps & emails) | `https://techysaumyadeep.vercel.app` |
+| **NEXT_PUBLIC_SITE_URL** | Canonical base URL (for dynamic sitemaps & emails) | `https://saumyadeep.co.in` |
 
 ---
 
