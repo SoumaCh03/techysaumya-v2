@@ -396,6 +396,36 @@ export default function ResumePage() {
                 </p>
               </div>
 
+              {/* Project 7 */}
+              <div className="print-card">
+                <h3 className="font-display font-bold text-sm md:text-base text-white print:text-black">
+                  AUTOCRAFT
+                </h3>
+                <p className="text-text-secondary print:text-black/70 text-xs md:text-sm leading-relaxed mt-1 font-sans font-medium">
+                  Designed and developed a production-ready MERN automobile e-commerce platform featuring secure authentication, advanced admin dashboard, inventory management, order processing, Razorpay payment integration, analytics, wishlist, reviews, coupons, responsive UI, and scalable enterprise-grade architecture.
+                </p>
+              </div>
+
+              {/* Project 8 */}
+              <div className="print-card">
+                <h3 className="font-display font-bold text-sm md:text-base text-white print:text-black">
+                  Codeac AI Code Reviewer
+                </h3>
+                <p className="text-text-secondary print:text-black/70 text-xs md:text-sm leading-relaxed mt-1 font-sans font-medium">
+                  Developed an AI-powered code review platform that analyzes repositories, detects potential issues, suggests improvements, and assists developers through intelligent automated code quality analysis.
+                </p>
+              </div>
+
+              {/* Project 9 */}
+              <div className="print-card">
+                <h3 className="font-display font-bold text-sm md:text-base text-white print:text-black">
+                  NovaSosh
+                </h3>
+                <p className="text-text-secondary print:text-black/70 text-xs md:text-sm leading-relaxed mt-1 font-sans font-medium">
+                  Built a modern TypeScript application following scalable architecture, clean coding principles, and contemporary software engineering practices.
+                </p>
+              </div>
+
             </div>
           </section>
 
